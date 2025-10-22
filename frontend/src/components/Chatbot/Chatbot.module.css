@@ -1,0 +1,97 @@
+.backdrop {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 2000;
+}
+
+.sheet {
+  width: 350px;
+  height: 480px;
+  background: #fefefe;
+  color: #000;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header {
+  padding: 10px 16px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: Inter, sans-serif;
+}
+
+.headerButtons {
+  display: flex;
+  gap: 10px;
+}
+
+.iconBtn {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bubble {
+  padding: 8px 12px;
+  border-radius: 10px;
+  max-width: 80%;
+  line-height: 1.3;
+  font-family: Inter, sans-serif;
+}
+
+.user {
+  align-self: flex-end;
+  background: #000;
+  color: #fff;
+}
+
+.assistant {
+  align-self: flex-start;
+  background: #eaeaea;
+  color: #000;
+}
+
+.inputRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-top: 1px solid #eee;
+  padding: 10px;
+}
+
+.textarea {
+  flex: 1;
+  min-height: 38px;
+  max-height: 100px;
+  resize: vertical;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-family: Inter, sans-serif;
+  padding: 6px 8px;
+}
+
+.send {
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+}

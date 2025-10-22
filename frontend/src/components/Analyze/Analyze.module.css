@@ -1,0 +1,52 @@
+.section {
+  font-family: Inter, sans-serif;
+  color: #222;
+  display: flex;
+  justify-content: center;
+  margin-top: 60px;
+  padding: 20px;
+}
+
+.container {
+  width: 100%;
+  max-width: 900px;
+}
+
+.card {
+  background: #4f494996;
+  border-radius: 12px;
+  padding: 40px 30px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.heading {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 30px;
+}
+
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.textarea {
+  width: 100%;
+  max-width: 800px;
+  height: 280px;
+  padding: 16px;
+  font-size: 15px;
+  font-family: monospace;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #f1f5f9;
+  color: #000;
+  resize: vertical;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* add your button, result, graphBox, resetBtn etc. from your existing inline styles */
