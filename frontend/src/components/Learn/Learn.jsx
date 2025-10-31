@@ -10,7 +10,6 @@ const Learn = () => {
 
   return (
     <section id="learn" className="learn-section">
-      {/* ========= LEARN VIDEO ========= */}
       <div className="learn-card">
         <h1 className="learn-title">Learn</h1>
         <div className="learn-video">

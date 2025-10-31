@@ -1,3 +1,31 @@
-body{
-    background-color: black;
+:root{
+  --bg: #ffffff;
+  --text: #111;
+  --card-bg: #ffffff;
+  --card-border: #000;
+  --button-bg: #e0e0e0;
+  --button-text: #111;
+}
+
+.dark {
+  --bg: #0b0f16;
+  --text: #eef2ff;
+  --card-bg: #0f1724;
+  --card-border: #ffffff;
+  --button-bg: #1f2937;
+  --button-text: #f8fafc;
+}
+
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  transition: background 250ms ease, color 250ms ease;
+}
+
+* {
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
 }

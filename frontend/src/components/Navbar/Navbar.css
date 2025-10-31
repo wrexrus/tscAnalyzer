@@ -1,0 +1,57 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  padding: 16px 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg);
+  color: var(--text);
+  transition: background 250ms, color 250ms;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.nav-left {
+  display: flex;
+  gap: 30px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: var(--text);
+  font-size: 1.4rem;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 10px;
+  transition: 0.2s;
+}
+
+.nav-link.hovered {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.theme-toggle,
+.chatbot-btn {
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--card-border);
+  background: transparent;
+  color: var(--text);
+  font-size: 1rem;
+  transition: 0.2s;
+}
+
+.chatbot-btn.hovered,
+.theme-toggle:hover {
+  background: var(--text);
+  color: var(--bg);
+}
