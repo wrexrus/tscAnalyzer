@@ -14,9 +14,9 @@ const AnalyzeResult = ({ code, result, onReset, ComplexityGraph }) => (
       <ComplexityGraph explanation={result?.explanation} />
     </div>
 
-    <button className={styles.resetBtn} onClick={onReset}>
+    <span className={styles.resetBtn} onClick={onReset}>
       Test New Code
-    </button>
+    </span>
   </div>
 );
 
