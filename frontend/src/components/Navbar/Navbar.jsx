@@ -1,10 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Navbar.css'; 
+import { ToastContainer } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import { handleSuccess } from '../../pages/utils';
 
 const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
   const [hoveredLink, setHoveredLink] = useState(null);
   const [chatbotHovered, setChatbotHovered] = useState(false);
   const isDark = currentTheme === "dark";
+  const [ loggedInUser,setLoggedInUser ] = useState('Signup');
+  const navigate = useNavigate();  
+
+  useEffect(()=>{
+    setLoggedInUser(localStorage.getItem('loggedInUser'));
+  })
+  
+  const handleLogout = () => {
+    localStorage.removeItem('loggedInUser');
+    localStorage.removeItem('token');
+    setLoggedInUser('SignUp');
+    handleSuccess('Logged out successfully');
+    // navigate('/signup');
+  };
 
   return (
     <nav className="navbar">
@@ -24,7 +41,7 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
 
       <div className="nav-right">
         <button className="theme-toggle" onClick={toggleTheme}>
-          {isDark ? '☀️ Light' : '🌙 Dark'}
+          {isDark ? '☀️' : '🌙'}
         </button>
 
         <div
@@ -35,7 +52,28 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
         >
           🤖 Ask me
         </div>
+          
+        {loggedInUser ? (
+          <div className="user-section">
+            <div className='profile'>
+              {loggedInUser}
+            </div>
+            <button className='logout-btn' onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
+        ) : (
+          <div className="profile" 
+          onClick={()=> navigate('/signup')}
+          style={{cursor:'pointer'}}
+          >
+            SignUp   
+          </div>
+        )}
+        
+      <ToastContainer />
       </div>
+
     </nav>
   );
 };

@@ -1,21 +1,26 @@
+import dotenv from "dotenv";  
 import express from "express"; 
 import bodyParser from "body-parser"; 
 import cors from "cors"; 
-import dotenv from "dotenv"; 
 import { GoogleGenerativeAI } from "@google/generative-ai";
-
 dotenv.config(); 
-const app = express(); 
+import './Models/db.js';
+import AuthRouter from './Routes/AuthRouter.js';
 
-app.use(cors({ 
+const app = express();  // initliaze
+console.log("MONGO_CONN =", process.env.MONGO_CONN);
+
+app.use(cors({   // we use cors so that an frontend from any port can send request to backend 
     origin: "*", 
 })); 
-
 app.use(bodyParser.json());
 
 app.get("/", (_req, res) => { 
     res.status(200).send("OK"); 
 });
+
+// router
+app.use('/auth',AuthRouter);
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -79,6 +84,7 @@ app.post("/analyze", async (req, res) => {
 
 
 const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 }); 
