@@ -4,6 +4,8 @@ import './Signup.css'
 import { ToastContainer } from 'react-toastify';
 import { handleError, handleSuccess } from './utils';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const Login = () => {
     const [loginInfo,setLoginInfo] = useState({
         email: '',
@@ -26,7 +28,7 @@ const Login = () => {
             return handleError('Field must not be empty');
         }
         try{
-            const url = "http://localhost:5000/auth/login";
+            const url = `${API_URL}/auth/login`
             const response = await fetch(url,{
                 method: "POST",
                 headers:{

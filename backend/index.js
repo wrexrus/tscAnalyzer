@@ -7,11 +7,16 @@ dotenv.config();
 import './Models/db.js';
 import AuthRouter from './Routes/AuthRouter.js';
 
+
 const app = express();  // initliaze
-console.log("MONGO_CONN =", process.env.MONGO_CONN);
+
+const CLIENT_URL = process.env.CLIENT_URL || '*';
+
+app.use(express.json());
 
 app.use(cors({   // we use cors so that an frontend from any port can send request to backend 
-    origin: "*", 
+    origin: CLIENT_URL,
+    credentials: true
 })); 
 app.use(bodyParser.json());
 
