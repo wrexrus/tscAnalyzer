@@ -54,7 +54,7 @@ const Signup = () => {
     }
 
     return (
-        <>
+        <div className='container'>
             <div className="signup-container">
                 <h1>Create Account</h1>
                 <form onSubmit={handleSignUp}>
@@ -95,14 +95,14 @@ const Signup = () => {
                     <button className="btn">Sign Up</button>
 
                     <p className="redirect-text">
-                        Already have an account? <Link to="/login">Login</Link>
+                        Already have an account? <Link to="/login" id='login'>Login</Link>
                     </p>
                 </form>
 
 
                 <ToastContainer />
             </div>
-        </>
+        </div>
     )
 }
 

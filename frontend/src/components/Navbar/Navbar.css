@@ -57,9 +57,22 @@
   cursor: pointer;
 }
 .chatbot-btn.hovered,
-.theme-toggle:hover,
-.profile:hover {
+.theme-toggle:hover
+{
   background: var(--text);
   color: var(--bg);
 }
 
+.logout-btn {
+  font-weight: 700;
+  text-align: center;
+  color: var(--text);
+  margin: 1px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  color: var(--text);
+  transform: scale(1.25);
+}

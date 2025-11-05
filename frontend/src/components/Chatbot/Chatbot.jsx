@@ -35,7 +35,7 @@ export default function Chatbot({ open, onClose }) {
       setMessages(prev=>[...prev,{ role:'assistant',content:data.reply||'No reply' }]);
     }catch(e){
       setMessages(prev=>[...prev,{ role:'assistant',content:'Server error' }]);
-    }finally{
+    }finally{ 
       setSending(false);
     }
   };

@@ -57,10 +57,10 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
           <div className="user-section">
             <div className='profile'>
               {loggedInUser}
+              <p className='logout-btn' onClick={handleLogout}>
+                Logout
+              </p>
             </div>
-            <button className='logout-btn' onClick={handleLogout}>
-              Logout
-            </button>
           </div>
         ) : (
           <div className="profile" 

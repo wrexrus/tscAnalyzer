@@ -1,35 +1,46 @@
+.container{
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+}
 
 .signup-container {
+  display: flex;
+  flex-direction: column;
   width: 420px;
-  background: #ffffff;
-  padding: 2rem;
+  background: black;
+  padding: 3rem;
+  border: 1px solid snow;
   border-radius: 12px;
   box-shadow: 0px 4px 25px rgba(0, 0, 0, 0.12);
   text-align: center;
 }
 
+
 .signup-container h1 {
   margin-bottom: 1.5rem;
   font-size: 26px;
   font-weight: 600;
-  color: #333;
+  color: white;
 }
 
 .input-group {
   text-align: left;
   margin-bottom: 1.2rem;
+  width: 93%;
 }
 
 .input-group label {
   display: block;
-  margin-bottom: 6px;
-  font-size: 14px;
-  color: #444;
+  margin-bottom: 8px;
+  font-size: 18px;
+  color: #ffffff;
 }
 
 .input-group input {
   width: 100%;
-  padding: 10px;
+  padding: 14px;
   font-size: 15px;
   border-radius: 8px;
   border: 1px solid #ccc;
@@ -60,10 +71,15 @@
 }
 
 .redirect-text {
-    cursor: pointer;
-  color: #c90000;
+  cursor: pointer;
+  color: #ffffff;
   margin-top: 1rem;
   font-size: 14px;
+}
+
+#login{
+  font-size: 17px;
+  color: #f5ffbd;
 }
 
 .redirect-text a {
@@ -72,4 +88,5 @@
 
 .redirect-text a:hover {
   text-decoration: underline;
+  color: white;
 }
