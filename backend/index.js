@@ -16,6 +16,7 @@ app.use(cors({   // we use cors so that an frontend from any port can send reque
     origin: "*",
     credentials: true
 })); 
+
 app.use(bodyParser.json());
 
 app.get("/", (_req, res) => { 
@@ -66,7 +67,9 @@ async function generateWithRetry(model, prompt, retries = 3, delay = 2000) {
 app.post("/analyze", async (req, res) => { 
     try { 
         const { code } = req.body; 
-        if (!code) return res.status(400).json({ error: "No code provided" }); 
+        if (!code) return res.status(400).json({ 
+            error: "No code provided",
+        }); 
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); 
         const prompt = 
         `Analyze the following code and explain briefly. 

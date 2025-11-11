@@ -16,7 +16,10 @@ const Analyze = () => {
   const [progress, setProgress] = useState(0);
 
   const handleAnalyze = async () => {
-    if (!code.trim()) return;
+    if (!code.trim()){
+       alert("No code provided");
+       return;
+    }
     setLoading(true);
     setProgress(8);
 

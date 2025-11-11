@@ -88,3 +88,28 @@
   position: relative;
   z-index: 1;
 }
+
+.analyzeBtn {
+  position: relative;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #4b479c, #3b83f62a);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.2s ease, opacity 0.3s ease;
+}
+
+.analyzeBtn:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+.analyzeBtnDisabled {
+  background: #444;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
