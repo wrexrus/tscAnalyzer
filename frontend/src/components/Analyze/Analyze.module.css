@@ -73,3 +73,18 @@
   margin-left: 350px;
   margin-top: 20px;
 }
+
+.progressFill{
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.46));
+  transition: width .22s ease;
+}
+
+.btnLabel{
+  position: relative;
+  z-index: 1;
+}
