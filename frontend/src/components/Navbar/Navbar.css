@@ -71,8 +71,3 @@
   font-size: 1rem;
   transition: all 0.2s ease;
 }
-
-.logout-btn:hover {
-  color: var(--text);
-  transform: scale(1.25);
-}

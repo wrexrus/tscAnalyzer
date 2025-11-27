@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './Navbar.css'; 
+import './Navbar.css';
 import { ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { handleSuccess } from '../../pages/utils';
@@ -8,13 +8,21 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
   const [hoveredLink, setHoveredLink] = useState(null);
   const [chatbotHovered, setChatbotHovered] = useState(false);
   const isDark = currentTheme === "dark";
-  const [ loggedInUser,setLoggedInUser ] = useState('Signup');
-  const navigate = useNavigate();  
+  const [loggedInUser, setLoggedInUser] = useState('Signup');
+  const navigate = useNavigate();
 
-  useEffect(()=>{
+  useEffect(() => {
     setLoggedInUser(localStorage.getItem('loggedInUser'));
-  })
-  
+    // update on storage changes (other tabs) and on custom authChanged event (this tab)
+    const onAuthChange = () => setLoggedInUser(localStorage.getItem('loggedInUser'));
+    window.addEventListener('storage', onAuthChange);
+    window.addEventListener('authChanged', onAuthChange);
+    return () => {
+      window.removeEventListener('storage', onAuthChange);
+      window.removeEventListener('authChanged', onAuthChange);
+    };
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem('loggedInUser');
     localStorage.removeItem('token');
@@ -52,7 +60,7 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
         >
           🤖 Ask me
         </div>
-          
+
         {loggedInUser ? (
           <div className="user-section">
             <div className='profile'>
@@ -63,15 +71,15 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
             </div>
           </div>
         ) : (
-          <div className="profile" 
-          onClick={()=> navigate('/signup')}
-          style={{cursor:'pointer'}}
+          <div className="profile"
+            onClick={() => navigate('/signup')}
+            style={{ cursor: 'pointer' }}
           >
-            SignUp   
+            SignUp
           </div>
         )}
-        
-      <ToastContainer />
+
+        <ToastContainer />
       </div>
 
     </nav>

@@ -1,96 +1,107 @@
-import dotenv from "dotenv";  
-import express from "express"; 
-import bodyParser from "body-parser"; 
-import cors from "cors"; 
+import dotenv from "dotenv";
+import express from "express";
+import bodyParser from "body-parser";
+import cors from "cors";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-dotenv.config(); 
-import './Models/db.js';
-import AuthRouter from './Routes/AuthRouter.js';
+dotenv.config();
+import "./Models/db.js";
+import AuthRouter from "./Routes/AuthRouter.js";
+import ChatRouter from "./Routes/ChatRouter.js";
+import AnalyzeRouter from "./Routes/AnalyzeRouter.js";
 
-
-const app = express();  // initliaze
+const app = express(); // initliaze
 
 app.use(express.json());
 
-app.use(cors({   // we use cors so that an frontend from any port can send request to backend 
+app.use(
+  cors({
+    // we use cors so that an frontend from any port can send request to backend
     origin: "*",
-    credentials: true
-})); 
+    credentials: true,
+  })
+);
 
 app.use(bodyParser.json());
 
-app.get("/", (_req, res) => { 
-    res.status(200).send("OK"); 
+app.get("/", (_req, res) => {
+  res.status(200).send("OK");
 });
 
 // router
-app.use('/auth',AuthRouter);
+app.use("/auth", AuthRouter);
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+app.use("/chat", ChatRouter);
 
-app.post("/chat", async (req, res) => { 
-    try { 
-        const { messages = [] } = req.body; 
-        const history = messages 
-        .filter((m) => m.role === "user") 
-        .slice(-10) 
-        .map((m) => ({ 
-            role: "user", parts: [{ text: m.content }], 
-        })); 
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); 
-        const chat = model.startChat({ history }); 
-        const lastUser = history[history.length - 1]?.parts?.[0]?.text || ""; 
-        const result = await chat.sendMessage(`Answer in moderate way (max 6 lines): ${lastUser}`); 
-        res.json({ reply: result.response.text() }); 
-    } catch (e) { 
-        console.error("Chat error:", e); 
-        res.status(500).json({ reply: "Server error. Try again." }); 
-    } 
-});
+app.use("/analyze",AnalyzeRouter);
+
+// app.post("/chat", async (req, res) => {
+//     try {
+//         const { messages = [] } = req.body;
+//         const history = messages
+//         .filter((m) => m.role === "user")
+//         .slice(-10)
+//         .map((m) => ({
+//             role: "user", parts: [{ text: m.content }],
+//         }));
+//         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+//         const chat = model.startChat({ history });
+//         const lastUser = history[history.length - 1]?.parts?.[0]?.text || "";
+//         const result = await chat.sendMessage(`Answer in moderate way (max 6 lines): ${lastUser}`);
+//         res.json({ reply: result.response.text() });
+//     } catch (e) {
+//         console.error("Chat error:", e);
+//         res.status(500).json({ reply: "Server error. Try again." });
+//     }
+// });
 
 
-async function generateWithRetry(model, prompt, retries = 3, delay = 2000) { 
-    for (let attempt = 1; attempt <= retries; attempt++) { 
-        try { 
-            const result = await model.generateContent(prompt); 
-            return result; 
-        } catch (error) { 
-            if (error.status === 503 && attempt < retries) { 
-                await new Promise((r) => setTimeout(r, delay)); 
-            } else { 
-                throw error; 
-            } 
-        } 
-    } 
+/*
+async function generateWithRetry(model, prompt, retries = 3, delay = 2000) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const result = await model.generateContent(prompt);
+      return result;
+    } catch (error) {
+      if (error.status === 503 && attempt < retries) {
+        await new Promise((r) => setTimeout(r, delay));
+      } else {
+        throw error;
+      }
+    }
+  }
 }
 
-app.post("/analyze", async (req, res) => { 
-    try { 
-        const { code } = req.body; 
-        if (!code) return res.status(400).json({ 
-            error: "No code provided",
-        }); 
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); 
-        const prompt = 
-        `Analyze the following code and explain briefly. 
+app.post("/analyze", async (req, res) => {
+  try {
+    const { code } = req.body;
+    if (!code)
+      return res.status(400).json({
+        error: "No code provided",
+      });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const prompt = `Analyze the following code and explain briefly. 
         Return this exact structure: 
         Time Complexity: <Big-O> 
         Space Complexity: <Big-O>
         Why: <5-6 line explanation with only relevant points> 
         Code: 
-        ${code}` ; 
-        const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] }; 
-        const result = await generateWithRetry(model, payload); 
-        const responseText = result.response.text() || ""; res.json({explanation: responseText || "No content generated by Gemini."}); 
-        } catch (error) { 
-            console.error("❌ Error:", error); 
-            res.status(500).json({ error: "Internal server error" }); 
-            } 
+        ${code}`;
+    const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+    const result = await generateWithRetry(model, payload);
+    const responseText = result.response.text() || "";
+    res.json({
+      explanation: responseText || "No content generated by Gemini.",
     });
+  } catch (error) {
+    console.error("❌ Error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
+*/
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
-}); 
+});

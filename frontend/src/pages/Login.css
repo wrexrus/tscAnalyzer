@@ -90,3 +90,7 @@
   text-decoration: underline;
   color: white;
 }
+
+.home{
+  cursor: pointer;
+}
