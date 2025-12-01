@@ -1,9 +1,9 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const chat = async (req,res)=>{
     try{
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         const { messages = [] } = req.body;
         const history = messages
         .filter((m) => m.role === "user")

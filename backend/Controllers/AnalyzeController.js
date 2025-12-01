@@ -1,5 +1,4 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 async function generateWithRetry(model, prompt, retries = 3, delay = 2000) {
   for (let attempt = 1; attempt <= retries; attempt++) {
@@ -18,11 +17,12 @@ async function generateWithRetry(model, prompt, retries = 3, delay = 2000) {
 
 const analyze = async (req,res)=>{
     try{
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         const { code } = req.body;
-        if(!code) return req.status(400).json({
+        if(!code) return res.status(400).json({
             error: "No code provided",
         });
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const model =   genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         const prompt = 
             `Analyze the following code and explain briefly.
             Return the exact structure:

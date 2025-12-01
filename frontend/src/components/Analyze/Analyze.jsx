@@ -1,12 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import ComplexityGraph from "../ComplexityGraph";  
 import styles from "./Analyze.module.css";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL?.replace(/\/+$/, '') ||
-  (window.location.hostname === "localhost"
-    ? "http://localhost:5000"
-    : "");
+const API_BASE_URL = import.meta.env.VITE_API_URL?.replace(/\/+$/, '');
 
 const Analyze = () => {
   const [code, setCode] = useState('');
