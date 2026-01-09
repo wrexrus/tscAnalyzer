@@ -32,7 +32,7 @@ app.use("/auth", AuthRouter);
 
 app.use("/chat", ChatRouter);
 
-app.use("/analyze",AnalyzeRouter);
+app.use("/analyze", AnalyzeRouter);
 
 // app.post("/chat", async (req, res) => {
 //     try {
