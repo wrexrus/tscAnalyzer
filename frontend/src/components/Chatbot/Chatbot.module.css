@@ -8,11 +8,11 @@
 .sheet {
   width: 350px;
   height: 480px;
-  background: #fefefe;
-  color: #000;
-  border: 1px solid #ddd;
+  background: var(--card-bg);
+  color: var(--text);
+  border: 1px solid var(--card-border);
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -20,11 +20,12 @@
 
 .header {
   padding: 10px 16px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--card-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-family: Inter, sans-serif;
+  background: rgba(var(--bg), 0.5);
 }
 
 .headerButtons {
@@ -37,6 +38,7 @@
   border: none;
   font-size: 1.1rem;
   cursor: pointer;
+  color: var(--text);
 }
 
 .list {
@@ -58,22 +60,24 @@
 
 .user {
   align-self: flex-end;
-  background: #000;
-  color: #fff;
+  background: var(--primary);
+  color: #ffffff;
 }
 
 .assistant {
   align-self: flex-start;
-  background: #eaeaea;
-  color: #000;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--card-border);
 }
 
 .inputRow {
   display: flex;
   align-items: center;
   gap: 8px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--card-border);
   padding: 10px;
+  background: var(--card-bg);
 }
 
 .textarea {
@@ -81,17 +85,29 @@
   min-height: 38px;
   max-height: 100px;
   resize: vertical;
-  border: 1px solid #ccc;
+  border: 1px solid var(--card-border);
   border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
   font-family: Inter, sans-serif;
-  padding: 6px 8px;
+  padding: 8px;
+  outline: none;
+}
+
+.textarea:focus {
+  border-color: var(--primary);
 }
 
 .send {
-  background: #000;
-  color: #fff;
+  background: var(--primary);
+  color: #ffffff;
   border: none;
   border-radius: 8px;
   padding: 8px 16px;
   cursor: pointer;
+  transition: 0.2s;
+}
+
+.send:hover {
+  background: var(--primary-hover);
 }

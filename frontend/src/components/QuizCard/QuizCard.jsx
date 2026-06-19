@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import questionsData from "./QuizData"; // Importing the static list as a fallback/mock
 import styles from "./QuizCard.module.css";
+import axios from "axios"; // Import axios for API calls
 
-const topics = [
+let topics = [
   "Quick Sort",
   "Merge Sort",
   "Binary Search",
@@ -11,34 +11,43 @@ const topics = [
   "Singly Linked lists",
   "Doubly Linked lists",
   "Trees",
-  "Graphs"
+  "Graphs",
+  "Recursion", "Stack and Queues", "Binary Trees",
 ];
 
 const QuizCard = () => {
-  // Mode state: 'topics' | 'quiz' | 'loading'
+  // Mode state: 'topics' | 'difficulty' | 'quiz' | 'loading'
   const [viewMode, setViewMode] = useState("topics");
+  const [selectedTopic, setSelectedTopic] = useState(null);
   const [currentQuestions, setCurrentQuestions] = useState([]);
-
-  // Quiz taking state
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [score, setScore] = useState(0);
   const [showScoreHelper, setShowScoreHelper] = useState(false);
 
-  const handleTopicClick = (topic) => {
-    // In the future, this would fetch from backend.
-    // For now, we load the static data to simulate the flow.
+  const handleTopicSelect = (topic) => {
+    setSelectedTopic(topic);
+    setViewMode("difficulty");
+  };
+
+  const handleDifficultySelect = async (difficulty) => {
     setViewMode("loading");
 
-    // Simulate network delay
-    setTimeout(() => {
-      // Here we could filter questionsData based on topic if we had categorized data.
-      // For now, just load all static questions.
-      setCurrentQuestions(questionsData);
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_URL?.replace(/\/+$/, '') || "http://localhost:5000";
+      const response = await axios.post(`${API_BASE_URL}/quiz/generate-questions`, {
+        topic: selectedTopic,
+        difficulty,
+      });
+      setCurrentQuestions(response.data.questions);
       setViewMode("quiz");
       resetQuizState();
-    }, 600);
+    } catch (error) {
+      console.error("Error fetching questions:", error);
+      alert("Error generating questions. Please try again.");
+      setViewMode("topics"); // Go back to topics view on error
+    }
   };
 
   const resetQuizState = () => {
@@ -53,7 +62,7 @@ const QuizCard = () => {
     if (!isSubmitted) {
       setSelectedOption(index);
       setIsSubmitted(true);
-      if (index === currentQuestions[currentIndex].correctIndex) {
+      if (index === currentQuestions[currentIndex]?.correctIndex) {
         setScore((prev) => prev + 1);
       }
     }
@@ -71,6 +80,7 @@ const QuizCard = () => {
 
   const handleRestart = () => {
     setViewMode("topics");
+    setSelectedTopic(null);
     resetQuizState();
   };
 
@@ -79,21 +89,55 @@ const QuizCard = () => {
   if (viewMode === "loading") {
     return (
       <div className={styles["quiz-card"]}>
-        <h3 style={{ color: "#888" }}>Generating questions...</h3>
+        <h3 style={{ color: "#888" }}>Generating {selectedTopic} questions...</h3>
+        <p style={{ color: "#555", marginTop: "10px" }}>This might take a few seconds.</p>
       </div>
     );
   }
 
   // 1. TOPIC SELECTION View
   if (viewMode === "topics") {
+    const row1 = topics.slice(0, 3);
+    const row2 = topics.slice(3, 7);
+    const row3 = topics.slice(7);
+    
+    const isLoggedIn = !!localStorage.getItem("token");
+
     return (
-      <div className={styles["quiz-card"]}>
-        <div className={styles["topic-grid"]}>
-          {topics.map((topic, index) => (
+      <div className={styles["quiz-container"]}>
+        {!isLoggedIn && (
+          <div style={{ textAlign: "center", marginBottom: "10px", color: "#ffadad", fontStyle: "italic", fontSize: "1.1rem" }}>
+            * Do login to save progress
+          </div>
+        )}
+        <div className={styles["topic-row"]}>
+          {row1.map((topic) => (
             <button
-              key={index}
-              className={styles["topic-item"]}
-              onClick={() => handleTopicClick(topic)}
+              key={topic}
+              className={styles["topic-text"]}
+              onClick={() => handleTopicSelect(topic)}
+            >
+              {topic}
+            </button>
+          ))}
+        </div>
+        <div className={styles["topic-row"]}>
+          {row2.map((topic) => (
+            <button
+              key={topic}
+              className={styles["topic-text"]}
+              onClick={() => handleTopicSelect(topic)}
+            >
+              {topic}
+            </button>
+          ))}
+        </div>
+        <div className={styles["topic-row"]}>
+          {row3.map((topic) => (
+            <button
+              key={topic}
+              className={styles["topic-text"]}
+              onClick={() => handleTopicSelect(topic)}
             >
               {topic}
             </button>
@@ -103,8 +147,45 @@ const QuizCard = () => {
     );
   }
 
+  // 1.5 DIFFICULTY SELECTION View
+  if (viewMode === "difficulty") {
+    return (
+      <div className={styles["quiz-card"]}>
+        <h2 className={styles["quiz-question"]} style={{ marginBottom: "40px" }}>
+          Select Difficulty for {selectedTopic}
+        </h2>
+        <div className={styles["difficulty-container"]}>
+          <button 
+            className={`${styles["quiz-option"]} ${styles["difficulty-btn"]} ${styles["basic"]}`}
+            onClick={() => handleDifficultySelect("basic")}
+          >
+            Basic
+          </button>
+          <button 
+            className={`${styles["quiz-option"]} ${styles["difficulty-btn"]} ${styles["advanced"]}`}
+            onClick={() => handleDifficultySelect("advanced")}
+          >
+            Advanced
+          </button>
+        </div>
+        <button onClick={handleRestart} className={styles["quiz-restart-btn"]} style={{ marginTop: "40px" }}>
+          Back to Topics
+        </button>
+      </div>
+    );
+  }
+
   // 2. QUIZ TAKING View
   const currentQuestion = currentQuestions[currentIndex];
+
+  if (!currentQuestion) {
+    return (
+      <div className={styles["quiz-card"]}>
+        <h3 style={{ color: "#f44336" }}>Error loading questions.</h3>
+        <button onClick={handleRestart} className={styles["quiz-restart-btn"]}>Back to Topics</button>
+      </div>
+    );
+  }
 
   return (
     <div className={styles["quiz-card"]}>
@@ -172,8 +253,8 @@ const QuizCard = () => {
           </h2>
           <p style={{ color: "#aaa", marginBottom: "20px" }}>
             {score === currentQuestions.length
-              ? "Perfect score! You're a pro! 🚀"
-              : "Good practice! Keep it up. 💪"}
+              ? "Perfect score! You're a pro! "
+              : "Good practice! Keep it up. "}
           </p>
           <button onClick={handleRestart} className={styles["quiz-restart-btn"]}>
             Choose Another Topic

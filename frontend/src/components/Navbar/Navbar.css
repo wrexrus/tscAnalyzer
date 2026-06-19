@@ -6,7 +6,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: rgba(var(--bg), 0.85); /* Note: might need slight tweak if var isn't rgb, but var(--bg) usually works with modern setups, fallback to var(--bg) below */
   background: var(--bg);
+  backdrop-filter: blur(10px);
   color: var(--text);
   transition: background 250ms, color 250ms;
   border-bottom: 1px solid var(--card-border);
@@ -27,9 +29,9 @@
   transition: 0.2s;
 }
 
-.nav-link.hovered {
-  background: var(--text);
-  color: var(--bg);
+.nav-link.hovered, .nav-link:hover {
+  background: var(--primary);
+  color: #ffffff;
 }
 
 .nav-right {
@@ -55,12 +57,16 @@
   border-radius: 20px;
   border: 1px solid var(--card-border);
   cursor: pointer;
+  transition: 0.2s;
 }
+
 .chatbot-btn.hovered,
-.theme-toggle:hover
+.theme-toggle:hover,
+.profile:hover
 {
-  background: var(--text);
-  color: var(--bg);
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
 }
 
 .logout-btn {
