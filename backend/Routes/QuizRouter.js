@@ -44,6 +44,9 @@ Schema for each object:
     res.status(200).json({ questions });
   } catch (error) {
     console.error("Error generating questions:", error);
+    if (error.status === 503) {
+      return res.status(503).json({ error: "The AI model is currently experiencing high demand. Please wait a moment and try again!" });
+    }
     res.status(500).json({ error: "Failed to generate questions. Please try again." });
   }
 });

@@ -38,6 +38,9 @@ const analyze = async (req,res)=>{
         });
     }catch(error){
         console.log("Error:",error);
+        if (error.status === 503) {
+            return res.status(503).json({ error: "The AI model is currently experiencing high demand. Please wait a moment and try again!" });
+        }
         return res.status(500).json({ error: "Internal Server error" });
     }
 };

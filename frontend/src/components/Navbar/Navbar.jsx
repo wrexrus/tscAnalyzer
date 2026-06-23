@@ -8,7 +8,7 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
   const [hoveredLink, setHoveredLink] = useState(null);
   const [chatbotHovered, setChatbotHovered] = useState(false);
   const isDark = currentTheme === "dark";
-  const [loggedInUser, setLoggedInUser] = useState('Signup');
+  const [loggedInUser, setLoggedInUser] = useState(localStorage.getItem('loggedInUser'));
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,9 +26,9 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
   const handleLogout = () => {
     localStorage.removeItem('loggedInUser');
     localStorage.removeItem('token');
-    setLoggedInUser('SignUp');
+    setLoggedInUser(null);
+    window.dispatchEvent(new Event('authChanged'));
     handleSuccess('Logged out successfully');
-    // navigate('/signup');
   };
 
   return (
@@ -49,7 +49,7 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
 
       <div className="nav-right">
         <button className="theme-toggle" onClick={toggleTheme}>
-          {isDark ? '☀️' : '🌙'}
+          {isDark ? 'Light' : 'Dark'}
         </button>
 
         <div
@@ -62,21 +62,18 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
         </div>
 
         {loggedInUser ? (
-          <div className="user-section">
-            <div className='profile'>
+          <div className="user-section" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <span className="profile-name" style={{ fontWeight: '600' }}>
               {loggedInUser}
-              <p className='logout-btn' onClick={handleLogout}>
-                Logout
-              </p>
-            </div>
+            </span>
+            <button className="auth-btn logout-btn" onClick={handleLogout}>
+              Logout
+            </button>
           </div>
         ) : (
-          <div className="profile"
-            onClick={() => navigate('/signup')}
-            style={{ cursor: 'pointer' }}
-          >
+          <button className="auth-btn signup-btn" onClick={() => navigate('/signup')}>
             SignUp
-          </div>
+          </button>
         )}
 
         <ToastContainer />

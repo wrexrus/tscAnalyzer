@@ -43,6 +43,7 @@ const Login = () => {
                 handleSuccess(message);
                 localStorage.setItem('token', jwtToken);
                 localStorage.setItem('loggedInUser', name);
+                window.dispatchEvent(new Event('authChanged'));
                 setTimeout(() => {
                     navigate('/');
                 }, 1000)
@@ -94,7 +95,7 @@ const Login = () => {
 
                     <span className='home' onClick={() => {
                         navigate('/');
-                    }}> <Home /> </span>
+                    }}> Home </span>
 
                     <ToastContainer />
                 </div>

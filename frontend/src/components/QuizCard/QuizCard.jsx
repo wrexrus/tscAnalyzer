@@ -1,23 +1,23 @@
 import React, { useState } from "react";
 import styles from "./QuizCard.module.css";
-import axios from "axios"; // Import axios for API calls
+import axios from "axios";
 
-let topics = [
-  "Quick Sort",
-  "Merge Sort",
-  "Binary Search",
-  "Strings",
-  "Arrays",
-  "Singly Linked lists",
-  "Doubly Linked lists",
-  "Trees",
-  "Graphs",
-  "Recursion", "Stack and Queues", "Binary Trees",
-];
+const CATEGORIES = {
+  "Linear Data Structures": [
+    "Arrays", "Strings", "Singly Linked lists", "Doubly Linked lists", "Stack and Queues"
+  ],
+  "Non-Linear Data Structures": [
+    "Trees", "Graphs", "Binary Trees"
+  ],
+  "Algorithms": [
+    "Quick Sort", "Merge Sort", "Binary Search", "Recursion"
+  ]
+};
 
 const QuizCard = () => {
-  // Mode state: 'topics' | 'difficulty' | 'quiz' | 'loading'
-  const [viewMode, setViewMode] = useState("topics");
+  // Mode state: 'categories' | 'topics' | 'difficulty' | 'quiz' | 'loading'
+  const [viewMode, setViewMode] = useState("categories");
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [currentQuestions, setCurrentQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -25,6 +25,22 @@ const QuizCard = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [score, setScore] = useState(0);
   const [showScoreHelper, setShowScoreHelper] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+
+  React.useEffect(() => {
+    const onAuthChange = () => setIsLoggedIn(!!localStorage.getItem('token'));
+    window.addEventListener('storage', onAuthChange);
+    window.addEventListener('authChanged', onAuthChange);
+    return () => {
+      window.removeEventListener('storage', onAuthChange);
+      window.removeEventListener('authChanged', onAuthChange);
+    };
+  }, []);
+
+  const handleCategorySelect = (category) => {
+    setSelectedCategory(category);
+    setViewMode("topics");
+  };
 
   const handleTopicSelect = (topic) => {
     setSelectedTopic(topic);
@@ -45,8 +61,12 @@ const QuizCard = () => {
       resetQuizState();
     } catch (error) {
       console.error("Error fetching questions:", error);
-      alert("Error generating questions. Please try again.");
-      setViewMode("topics"); // Go back to topics view on error
+      if (error.response && error.response.status === 503) {
+        alert(error.response.data.error || "The AI model is currently experiencing high demand. Please wait a moment and try again!");
+      } else {
+        alert("Error generating questions. Please try again.");
+      }
+      setViewMode("topics"); 
     }
   };
 
@@ -79,8 +99,9 @@ const QuizCard = () => {
   };
 
   const handleRestart = () => {
-    setViewMode("topics");
+    setViewMode("categories");
     setSelectedTopic(null);
+    setSelectedCategory(null);
     resetQuizState();
   };
 
@@ -89,65 +110,78 @@ const QuizCard = () => {
   if (viewMode === "loading") {
     return (
       <div className={styles["quiz-card"]}>
-        <h3 style={{ color: "#888" }}>Generating {selectedTopic} questions...</h3>
-        <p style={{ color: "#555", marginTop: "10px" }}>This might take a few seconds.</p>
+        <h3 style={{ color: "var(--text)", opacity: 0.8 }}>Generating {selectedTopic} questions...</h3>
+        <p style={{ color: "var(--text)", opacity: 0.6, marginTop: "10px" }}>This might take a few seconds.</p>
       </div>
     );
   }
 
-  // 1. TOPIC SELECTION View
-  if (viewMode === "topics") {
-    const row1 = topics.slice(0, 3);
-    const row2 = topics.slice(3, 7);
-    const row3 = topics.slice(7);
-    
-    const isLoggedIn = !!localStorage.getItem("token");
-
+  // 1. CATEGORY SELECTION View
+  if (viewMode === "categories") {
     return (
       <div className={styles["quiz-container"]}>
         {!isLoggedIn && (
-          <div style={{ textAlign: "center", marginBottom: "10px", color: "#ffadad", fontStyle: "italic", fontSize: "1.1rem" }}>
+          <div style={{ textAlign: "center", marginBottom: "10px", color: "red", opacity: 0.7, fontStyle: "italic", fontSize: "1.1rem" }}>
             * Do login to save progress
           </div>
         )}
-        <div className={styles["topic-row"]}>
-          {row1.map((topic) => (
+        <h2 className={styles["quiz-question"]} style={{ marginBottom: "20px" }}>
+          Select a Category
+        </h2>
+        <div className={styles["difficulty-container"]} style={{ maxWidth: "600px", marginBottom: "30px" }}>
+          {Object.keys(CATEGORIES).map(category => (
             <button
-              key={topic}
-              className={styles["topic-text"]}
-              onClick={() => handleTopicSelect(topic)}
+              key={category}
+              className={`${styles["quiz-option"]} ${styles["difficulty-btn"]}`}
+              onClick={() => handleCategorySelect(category)}
             >
-              {topic}
+              {category}
             </button>
           ))}
         </div>
-        <div className={styles["topic-row"]}>
-          {row2.map((topic) => (
-            <button
-              key={topic}
-              className={styles["topic-text"]}
-              onClick={() => handleTopicSelect(topic)}
+        
+        {isLoggedIn && (
+          <div style={{ marginTop: "20px", display: "flex", justifyContent: "center" }}>
+            <button 
+              className={styles["quiz-restart-btn"]} 
+              style={{ padding: "8px 16px", fontSize: "0.9rem", background: "transparent", color: "var(--text)", border: "1px solid var(--card-border)" }}
+              onClick={() => alert("Check Progress feature coming soon!")}
             >
-              {topic}
+              Check Progress
             </button>
-          ))}
-        </div>
-        <div className={styles["topic-row"]}>
-          {row3.map((topic) => (
-            <button
-              key={topic}
-              className={styles["topic-text"]}
-              onClick={() => handleTopicSelect(topic)}
-            >
-              {topic}
-            </button>
-          ))}
-        </div>
+          </div>
+        )}
       </div>
     );
   }
 
-  // 1.5 DIFFICULTY SELECTION View
+  // 2. TOPIC SELECTION View
+  if (viewMode === "topics") {
+    const categoryTopics = CATEGORIES[selectedCategory] || [];
+    return (
+      <div className={styles["quiz-container"]}>
+        <h2 className={styles["quiz-question"]} style={{ marginBottom: "20px" }}>
+          {selectedCategory} Topics
+        </h2>
+        <div className={styles["topic-row"]}>
+          {categoryTopics.map((topic) => (
+            <button
+              key={topic}
+              className={styles["topic-text"]}
+              onClick={() => handleTopicSelect(topic)}
+            >
+              {topic}
+            </button>
+          ))}
+        </div>
+        <button onClick={() => setViewMode("categories")} className={styles["quiz-restart-btn"]} style={{ marginTop: "40px" }}>
+          Back to Categories
+        </button>
+      </div>
+    );
+  }
+
+  // 3. DIFFICULTY SELECTION View
   if (viewMode === "difficulty") {
     return (
       <div className={styles["quiz-card"]}>
@@ -168,21 +202,21 @@ const QuizCard = () => {
             Advanced
           </button>
         </div>
-        <button onClick={handleRestart} className={styles["quiz-restart-btn"]} style={{ marginTop: "40px" }}>
+        <button onClick={() => setViewMode("topics")} className={styles["quiz-restart-btn"]} style={{ marginTop: "40px" }}>
           Back to Topics
         </button>
       </div>
     );
   }
 
-  // 2. QUIZ TAKING View
+  // 4. QUIZ TAKING View
   const currentQuestion = currentQuestions[currentIndex];
 
   if (!currentQuestion) {
     return (
       <div className={styles["quiz-card"]}>
         <h3 style={{ color: "#f44336" }}>Error loading questions.</h3>
-        <button onClick={handleRestart} className={styles["quiz-restart-btn"]}>Back to Topics</button>
+        <button onClick={handleRestart} className={styles["quiz-restart-btn"]}>Back to Categories</button>
       </div>
     );
   }
@@ -251,7 +285,7 @@ const QuizCard = () => {
           <h2>
             Score: {score} / {currentQuestions.length}
           </h2>
-          <p style={{ color: "#aaa", marginBottom: "20px" }}>
+          <p style={{ color: "var(--text)", opacity: 0.7, marginBottom: "20px" }}>
             {score === currentQuestions.length
               ? "Perfect score! You're a pro! "
               : "Good practice! Keep it up. "}

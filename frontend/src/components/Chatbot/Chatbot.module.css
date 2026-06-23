@@ -61,7 +61,7 @@
 .user {
   align-self: flex-end;
   background: var(--primary);
-  color: #ffffff;
+  color: var(--button-text);
 }
 
 .assistant {
@@ -100,7 +100,7 @@
 
 .send {
   background: var(--primary);
-  color: #ffffff;
+  color: var(--button-text);
   border: none;
   border-radius: 8px;
   padding: 8px 16px;

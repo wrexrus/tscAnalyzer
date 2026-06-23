@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { GrPowerReset } from "react-icons/gr";
+import styles from './Chatbot.module.css';
 
 const API_BASE = import.meta.env.VITE_API_URL;
 
@@ -41,38 +42,38 @@ export default function Chatbot({ open, onClose }) {
   };
 
   return(
-    <div style={styles.backdrop} onClick={onClose}>
-      <div style={styles.sheet} onClick={(e)=>e.stopPropagation()}>
-        <div style={styles.header}>
+    <div className={styles.backdrop} onClick={onClose}>
+      <div className={styles.sheet} onClick={(e)=>e.stopPropagation()}>
+        <div className={styles.header}>
           <strong>Assistant</strong>
-          <div style={{display:'flex',gap:'10px'}}>
-            <button style={styles.iconBtn} onClick={()=>setMessages([
+          <div className={styles.headerButtons}>
+            <button className={styles.iconBtn} onClick={()=>setMessages([
               { role:'assistant',content:"Hey! I'm your coding buddy. Ask me about Big-O, DSA, or this app ✨"}
             ])}>  <GrPowerReset /></button>
-            <button style={styles.iconBtn} onClick={onClose}>✕</button>
+            <button className={styles.iconBtn} onClick={onClose}>✕</button>
           </div>
         </div>
 
-        <div ref={listRef} style={styles.list}>
+        <div ref={listRef} className={styles.list}>
           {messages.map((m,i)=>(
-            <div key={i} style={{...styles.bubble, ...(m.role==='user'?styles.user:styles.assistant)}}>
+            <div key={i} className={`${styles.bubble} ${m.role==='user' ? styles.user : styles.assistant}`}>
               {m.content}
             </div>
           ))}
           {sending && (
-            <div style={{...styles.bubble,...styles.assistant}}>Thinking…</div>
+            <div className={`${styles.bubble} ${styles.assistant}`}>Thinking…</div>
           )}
         </div>
 
-        <div style={styles.inputRow}>
+        <div className={styles.inputRow}>
           <textarea
             value={input}
             onChange={(e)=>setInput(e.target.value)}
             onKeyDown={(e)=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}}
             placeholder="Ask anything"
-            style={styles.textarea}
+            className={styles.textarea}
           />
-          <button onClick={send} disabled={sending||!input.trim()} style={styles.send}>
+          <button onClick={send} disabled={sending||!input.trim()} className={styles.send}>
             {sending?('...'):('Send')}
           </button>
         </div>
@@ -80,67 +81,3 @@ export default function Chatbot({ open, onClose }) {
     </div>
   );
 }
-
-const styles={
-  backdrop:{
-    position:'fixed',bottom:'20px',right:'20px',zIndex:2000
-  },
-  sheet:{
-    width:'350px',
-    height:'480px',
-    background:'#fefefe',
-    color:'#000',
-    border:'1px solid #ddd',
-    borderRadius:'12px',
-    boxShadow:'0 4px 20px rgba(0,0,0,0.2)',
-    display:'flex',flexDirection:'column',
-    overflow:'hidden'
-  },
-  header:{
-    padding:'10px 16px',
-    borderBottom:'1px solid #eee',
-    display:'flex',
-    justifyContent:'space-between',
-    alignItems:'center',
-    fontFamily:'Inter,sans-serif',
-  },
-  iconBtn:{
-    background:'transparent',
-    border:'none',
-    fontSize:'1.1rem',
-    cursor:'pointer'
-  },
-  list:{
-    flex:1,
-    overflowY:'auto',
-    padding:'12px',
-    display:'flex',
-    flexDirection:'column',
-    gap:'8px'
-  },
-  bubble:{
-    padding:'8px 12px',
-    borderRadius:'10px',
-    maxWidth:'80%',
-    lineHeight:1.3,
-    fontFamily:'Inter,sans-serif'
-  },
-  user:{ alignSelf:'flex-end', background:'#000',color:'#fff'},
-  assistant:{ alignSelf:'flex-start', background:'#eaeaea',color:'#000'},
-  inputRow:{
-    display:'flex',alignItems:'center',gap:'8px',
-    borderTop:'1px solid #eee',
-    padding:'10px'
-  },
-  textarea:{
-    flex:1,minHeight:'38px',maxHeight:'100px',
-    resize:'vertical',border:'1px solid #ccc',
-    borderRadius:'8px',fontFamily:'Inter,sans-serif',
-    padding:'6px 8px'
-  },
-  send:{
-    background:'#000',color:'#fff',
-    border:'none',borderRadius:'8px',
-    padding:'8px 16px',cursor:'pointer'
-  }
-};

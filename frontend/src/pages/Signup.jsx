@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import './Signup.css'
 import { ToastContainer } from 'react-toastify';
 import { handleError, handleSuccess } from './utils';
-import { Home } from 'lucide-react';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const Signup = () => {
@@ -102,7 +101,7 @@ const Signup = () => {
 
                 <span className='home' onClick={()=>{
                     navigate('/');
-                }}> <Home /> </span>
+                }}> Home </span>
                 
                 <ToastContainer />
             </div>
