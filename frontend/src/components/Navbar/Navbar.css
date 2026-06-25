@@ -43,13 +43,21 @@
 .theme-toggle,
 .chatbot-btn {
   cursor: pointer;
-  padding: 6px 12px;
-  border-radius: 20px;
-  border: 1px solid var(--card-border);
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: none;
   background: transparent;
   color: var(--text);
-  font-size: 1rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  font-family: 'Outfit', sans-serif;
   transition: 0.2s;
+}
+
+.theme-toggle:hover,
+.chatbot-btn.hovered {
+  background: var(--primary);
+  color: var(--button-text);
 }
 
 .auth-btn {
@@ -70,16 +78,78 @@
 
 .signup-btn:hover {
   background: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-.logout-btn {
-  background: transparent;
-  color: var(--text);
+.profile-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--button-text);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+  user-select: none;
+}
+
+.profile-avatar:hover {
+  transform: scale(1.05);
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 120%;
+  right: 0;
+  background: var(--card-bg);
   border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 10px;
+  min-width: 150px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  animation: fadeInDown 0.2s ease;
 }
 
-.logout-btn:hover {
+.dropdown-user {
+  padding: 5px 10px;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+}
+
+.dropdown-divider {
+  border: 0;
+  height: 1px;
+  background: var(--card-border);
+  margin: 8px 0;
+}
+
+.dropdown-logout {
+  background: transparent;
+  color: #ff4757;
+  border: none;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: 0.2s;
+}
+
+.dropdown-logout:hover {
   background: #ff4757;
   color: white;
-  border-color: #ff4757;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

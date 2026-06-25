@@ -2,8 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { GrPowerReset } from "react-icons/gr";
 import styles from './Chatbot.module.css';
 
-const API_BASE = import.meta.env.VITE_API_URL;
-
+import { API_BASE_URL } from "../../api";
 export default function Chatbot({ open, onClose }) {
   const [messages, setMessages] = useState([
     { role:'assistant', content:"Hey! I'm your coding buddy. Ask me about Big-O, DSA ✨"}
@@ -28,7 +27,7 @@ export default function Chatbot({ open, onClose }) {
     setInput('');
     setSending(true);
     try{
-      const res=await fetch(`${API_BASE}/chat`,{
+      const res=await fetch(`${API_BASE_URL}/chat`,{
         method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({ messages: next })
       });

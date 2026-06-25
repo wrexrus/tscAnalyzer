@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ComplexityGraph from "../ComplexityGraph";  
 import styles from "./Analyze.module.css";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL?.replace(/\/+$/, '');
-
+import { API_BASE_URL } from "../../api";
 const Analyze = () => {
   const [code, setCode] = useState('');
   const [result, setResult] = useState(null);
@@ -35,9 +34,13 @@ const Analyze = () => {
     }, 250);
 
     try {
+      const token = localStorage.getItem('token');
       const res = await fetch(`${API_BASE_URL}/analyze`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          ...(token ? { "Authorization": token } : {})
+        },
         body: JSON.stringify({ code }),
       });
       const data = await res.json();
@@ -115,9 +118,8 @@ const Analyze = () => {
               {isLoggedIn && (
                 <div style={{ marginTop: "20px", display: "flex", justifyContent: "center" }}>
                   <button 
-                    className={styles.resetBtn}
-                    style={{ padding: "8px 16px", fontSize: "0.9rem", background: "transparent", border: "1px solid var(--card-border)" }}
-                    onClick={() => alert("Previous analysis feature coming soon!")}
+                    className={styles.analyzeBtn}
+                    onClick={() => window.location.href = '/dashboard?tab=history'}
                   >
                     Previous analysis
                   </button>
@@ -127,12 +129,12 @@ const Analyze = () => {
           ) : (
             <div className={styles.resultWrapper}>
               <div className={styles.codeBox}>
-                <h4 className={styles.panelTitle}>💻 Your Code</h4>
+                <h4 className={styles.panelTitle}>Your Code</h4>
                 <pre className={styles.codePreview}>{code}</pre>
               </div>
 
               <div className={styles.graphBox}>
-                <h4 className={styles.panelTitle}>📊 Complexity Explanation</h4>
+                <h4 className={styles.panelTitle}>Complexity Explanation</h4>
                 <p className={styles.explanation}>{result?.explanation}</p>
                 <ComplexityGraph explanation={result?.explanation} />
               </div>

@@ -1,9 +1,8 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { getGeminiModel, sendMessageWithRetry } from "../Services/GeminiService.js";
 
 
 const chat = async (req,res)=>{
     try{
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         const { messages = [] } = req.body;
         const history = messages
         .filter((m) => m.role === "user")
@@ -11,11 +10,11 @@ const chat = async (req,res)=>{
         .map((m)=>({
             role: "user", parts: [ { text: m.content } ]
         }));
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const model = getGeminiModel();
         const chat = model.startChat({ history });
         const lastUser = history[history.length - 1]?.parts?.[0]?.text || "";
         const systemPrompt = `You are a strict tutor. You must ONLY answer questions related to Data Structures, Algorithms (DSA), or Time/Space Complexity. If the user's question is NOT related to these topics, you MUST reply exactly with: "Please ask Question related to DSA or complexities". Keep all valid answers moderate (max 6 lines). User question: ${lastUser}`;
-        const result = await chat.sendMessage(systemPrompt);
+        const result = await sendMessageWithRetry(chat, systemPrompt);
         return res.json({ reply: result.response.text() });
     }catch(e){
         console.log("Chat Error:", e);

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styles from "./QuizCard.module.css";
 import axios from "axios";
+import { API_BASE_URL } from "../../api";
 
 const CATEGORIES = {
   "Linear Data Structures": [
@@ -19,6 +20,7 @@ const QuizCard = () => {
   const [viewMode, setViewMode] = useState("categories");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedTopic, setSelectedTopic] = useState(null);
+  const [selectedDifficulty, setSelectedDifficulty] = useState(null);
   const [currentQuestions, setCurrentQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -48,10 +50,10 @@ const QuizCard = () => {
   };
 
   const handleDifficultySelect = async (difficulty) => {
+    setSelectedDifficulty(difficulty);
     setViewMode("loading");
 
     try {
-      const API_BASE_URL = import.meta.env.VITE_API_URL?.replace(/\/+$/, '') || "http://localhost:5000";
       const response = await axios.post(`${API_BASE_URL}/quiz/generate-questions`, {
         topic: selectedTopic,
         difficulty,
@@ -88,13 +90,28 @@ const QuizCard = () => {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentIndex + 1 < currentQuestions.length) {
       setCurrentIndex((prev) => prev + 1);
       setSelectedOption(null);
       setIsSubmitted(false);
     } else {
       setShowScoreHelper(true);
+      if (isLoggedIn) {
+        try {
+          await axios.post(`${API_BASE_URL}/quiz/save-result`, {
+            category: selectedCategory,
+            topic: selectedTopic,
+            difficulty: selectedDifficulty,
+            score: score,
+            totalQuestions: currentQuestions.length
+          }, {
+            headers: { Authorization: localStorage.getItem('token') }
+          });
+        } catch (error) {
+          console.error("Failed to save quiz result:", error);
+        }
+      }
     }
   };
 
@@ -144,8 +161,7 @@ const QuizCard = () => {
           <div style={{ marginTop: "20px", display: "flex", justifyContent: "center" }}>
             <button 
               className={styles["quiz-restart-btn"]} 
-              style={{ padding: "8px 16px", fontSize: "0.9rem", background: "transparent", color: "var(--text)", border: "1px solid var(--card-border)" }}
-              onClick={() => alert("Check Progress feature coming soon!")}
+              onClick={() => window.location.href = '/dashboard?tab=progress'}
             >
               Check Progress
             </button>

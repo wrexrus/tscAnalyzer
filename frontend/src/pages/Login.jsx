@@ -5,8 +5,7 @@ import { ToastContainer } from 'react-toastify';
 import { handleError, handleSuccess } from './utils';
 import { Home } from 'lucide-react';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
+import { API_BASE_URL } from '../api';
 const Login = () => {
     const [loginInfo, setLoginInfo] = useState({
         email: '',
@@ -29,7 +28,7 @@ const Login = () => {
             return handleError('Field must not be empty');
         }
         try {
-            const url = `${API_URL}/auth/login`
+            const url = `${API_BASE_URL}/auth/login`
             const response = await fetch(url, {
                 method: "POST",
                 headers: {
@@ -89,7 +88,7 @@ const Login = () => {
                         <button className="btn">Login</button>
 
                         <p className="redirect-text">
-                            Dont have an account? <Link to="/signup" id='signup'> SignUp</Link>
+                            Dont have an account? <Link style={{fontSize: "19px"}} to="/signup" id='signup'> SignUp</Link>
                         </p>
                     </form>
 

@@ -8,7 +8,9 @@ import "./index.css";
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Dashboard from './pages/Dashboard';
 import 'react-toastify/ReactToastify.css';
+import { isExpired } from './pages/utils';
 
 const THEME_KEY = "themePreference";
 
@@ -33,23 +35,6 @@ const App = () => {
     setTheme(prev => (prev === "dark" ? "light" : "dark"));
   
   useEffect(()=>{
-    // jwt payload parser
-    function parseJwt(token){
-      if(!token) return null;
-      try{
-        const payload = token.split(".")[1];
-        const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
-        return JSON.parse(json);
-      }catch{
-        return null;
-      }
-    }
-
-    function isExpired(token){
-      const p = parseJwt(token);
-      if(!p || !p.exp) return true;
-      return Date.now() >= p.exp * 1000;
-    }
 
     const checkExpiry = ()=>{
       const token = localStorage.getItem("token");
@@ -89,6 +74,7 @@ const App = () => {
           }/>
           <Route path='/login' element={<Login />}/>
           <Route path='/signup' element={<Signup />}/>
+          <Route path='/dashboard' element={<Dashboard theme={theme} toggleTheme={toggleTheme} onBotClick={() => setChatOpen(true)} />}/>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <Chatbot open={chatOpen} onClose={() => setChatOpen(false)} />

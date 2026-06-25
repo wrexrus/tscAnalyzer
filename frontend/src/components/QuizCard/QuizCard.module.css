@@ -70,8 +70,8 @@
 }
 
 .quiz-question {
-  font-family: 'Playfair Display', serif;
-  font-size: 26px;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 22px;
   font-weight: 500;
   margin-bottom: 40px;
   text-align: center;
@@ -88,8 +88,8 @@
   border: 1px solid var(--card-border);
   border-radius: 4px;
   color: var(--text);
-  font-family: 'Outfit', sans-serif;
-  font-size: 17px;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 15px;
   cursor: pointer;
   transition: all 0.3s ease;
   text-align: left;
