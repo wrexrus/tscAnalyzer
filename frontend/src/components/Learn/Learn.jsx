@@ -3,6 +3,18 @@ import QuizCard from "../QuizCard/QuizCard";
 import { explanations } from "./constants";
 import "./Learn.css";
 
+const tiers = {
+  "O(1)": "excellent",
+  "O(log N)": "excellent",
+  "O(√N)": "good",
+  "O(N)": "good",
+  "O(N log N)": "fair",
+  "O(N²)": "bad",
+  "O(N³)": "bad",
+  "O(2^N)": "horrible",
+  "O(N!)": "horrible"
+};
+
 const Learn = () => {
   const [activeO, setActiveO] = useState(null);
   const [hoverHeading, setHoverHeading] = useState(false);
@@ -28,35 +40,36 @@ const Learn = () => {
       {/* ========= BIG-O GROWTH ========= */}
       <div className="learn-card">
         <h2
-          className="learn-heading"
+          className={`learn-heading ${hoverHeading ? "hovered" : ""}`}
           onMouseEnter={() => setHoverHeading(true)}
           onMouseLeave={() => setHoverHeading(false)}
         >
-          {hoverHeading
-            ? "The smaller the Big-O, the better the performance"
-            : "Growth of Big O"}
+          <span className="heading-text default-text">Growth of Big O</span>
+          <span className="heading-text hover-text">The smaller the Big-O, the better the performance</span>
         </h2>
 
         <div className="learn-wrapper">
           {Object.keys(explanations).map((item, index) => {
             const isHovered = hoveredItem === item;
+            const tier = tiers[item] || "good";
             return (
-              <span
-                key={index}
-                onClick={() =>
-                  setActiveO((prev) => (prev === item ? null : item))
-                }
-                className={`learn-o ${isHovered ? "hovered" : ""} ${
-                  activeO === item ? "active" : ""
-                }`}
-                onMouseEnter={() => setHoveredItem(item)}
-                onMouseLeave={() => setHoveredItem(null)}
-              >
-                {item}
+              <React.Fragment key={index}>
+                <span
+                  onClick={() =>
+                    setActiveO((prev) => (prev === item ? null : item))
+                  }
+                  className={`learn-o tier-${tier} ${isHovered ? "hovered" : ""} ${
+                    activeO === item ? "active" : ""
+                  }`}
+                  onMouseEnter={() => setHoveredItem(item)}
+                  onMouseLeave={() => setHoveredItem(null)}
+                >
+                  {item}
+                </span>
                 {index !== Object.keys(explanations).length - 1 && (
                   <span className="learn-separator">{`<`}</span>
                 )}
-              </span>
+              </React.Fragment>
             );
           })}
         </div>

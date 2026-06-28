@@ -35,12 +35,12 @@ const styles = {
   label: {
     marginBottom: "6px",
     fontSize: "14px",
-    color: "#2c3e50",
+    color: "var(--text)",
   },
   barBackground: {
     height: "16px",
     width: "100%",
-    background: "#ecf0f1",
+    background: "var(--card-border)",
     borderRadius: "8px",
     overflow: "hidden",
   },

@@ -42,6 +42,9 @@
 
 .theme-toggle,
 .chatbot-btn {
+  display: flex;
+  gap: 5px;
+  align-items: center;
   cursor: pointer;
   padding: 6px 10px;
   border-radius: 10px;
@@ -52,6 +55,20 @@
   font-weight: 500;
   font-family: 'Outfit', sans-serif;
   transition: 0.2s;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.theme-toggle svg {
+  display: block;
+}
+
+.theme-label {
+  line-height: 1;
 }
 
 .theme-toggle:hover,
@@ -69,6 +86,18 @@
   font-weight: 500;
   font-size: 1rem;
   transition: all 0.2s ease;
+}
+
+.login-btn {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--text);
+}
+
+.login-btn:hover {
+  background: var(--text);
+  color: var(--bg);
+  transform: translateY(-2px);
 }
 
 .signup-btn {

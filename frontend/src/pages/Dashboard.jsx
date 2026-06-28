@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar/Navbar';
 import styles from './Dashboard.module.css';
 import axios from 'axios';
-
+import { Bot } from 'lucide-react';
 import { API_BASE_URL } from '../api';
 
 const Dashboard = ({ theme, toggleTheme, onBotClick }) => {
@@ -97,7 +97,7 @@ const Dashboard = ({ theme, toggleTheme, onBotClick }) => {
           </div>
 
           <div className={styles.aiPanel}>
-            <h3 className={styles.aiTitle}>🤖 AI Tutor Review</h3>
+             <h3 className={styles.aiTitle}><Bot size={40}/> AI Tutor Review</h3>
             <p className={styles.aiDesc}>
               Get personalized feedback based on your recent {activeTab === 'progress' ? 'quiz performance' : 'coding history'}.
             </p>

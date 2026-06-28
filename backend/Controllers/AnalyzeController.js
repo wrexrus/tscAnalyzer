@@ -15,6 +15,8 @@ const analyze = async (req,res)=>{
             Language: <Programming Language>
             Time Complexity: <Big-O>
             Space Complexity: <Big-O>
+            Topic: <Main topic or data structure, e.g., Arrays, Graph, Sorting>
+            Difficulty: <Easy, Medium, or Hard>
             Why: <6-7 line explanation with only relevant points>
             Code: ${code}`;
         const payload = { contents: [{ role: "user",parts: [{ text: prompt }] }] };
@@ -34,6 +36,8 @@ const analyze = async (req,res)=>{
            const langMatch = responseText.match(/Language:\s*(.*)/i);
            const timeMatch = responseText.match(/Time Complexity:\s*(.*)/i);
            const spaceMatch = responseText.match(/Space Complexity:\s*(.*)/i);
+           const topicMatch = responseText.match(/Topic:\s*(.*)/i);
+           const difficultyMatch = responseText.match(/Difficulty:\s*(.*)/i);
            
            try {
              await AnalysisHistory.create({
@@ -41,6 +45,8 @@ const analyze = async (req,res)=>{
                 language: langMatch ? langMatch[1].trim() : "Unknown",
                 timeComplexity: timeMatch ? timeMatch[1].trim() : "Unknown",
                 spaceComplexity: spaceMatch ? spaceMatch[1].trim() : "Unknown",
+                topic: topicMatch ? topicMatch[1].trim() : "Unknown",
+                difficulty: difficultyMatch ? difficultyMatch[1].trim() : "Unknown",
                 explanation: responseText
              });
            } catch (dbErr) {
@@ -77,12 +83,12 @@ export const aiReview = async (req, res) => {
       return res.status(200).json({ review: "You haven't analyzed any code yet! Analyze some code to get personalized feedback on your coding habits." });
     }
 
-    const dataString = history.map(h => `Language: ${h.language} | Time: ${h.timeComplexity} | Space: ${h.spaceComplexity}`).join("\n");
+    const dataString = history.map(h => `Language: ${h.language} | Time: ${h.timeComplexity} | Topic: ${h.topic || 'Unknown'} | Difficulty: ${h.difficulty || 'Unknown'}`).join("\n");
     
     const model = getGeminiModel();
     const prompt = `You are an expert computer science tutor. Analyze the following recent coding history for a student. 
-    Note the languages they use and the average time/space complexities they write. 
-    Provide 1 specific, actionable tip on how they can write more optimal code in their preferred language.
+    Note the languages they use, the topics they practice, their difficulty level, and their average time complexities. 
+    Provide 1 specific, actionable tip on how they can write more optimal code or what topics they should practice next based on their weaknesses.
     Keep it encouraging and strictly under 5 sentences.
     
     Data:

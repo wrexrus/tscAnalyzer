@@ -58,6 +58,9 @@
   top: 100px;
 }
 .aiTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 1.5rem;
   color: var(--text);
   font-family: 'Playfair Display', serif;

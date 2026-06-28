@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { GrPowerReset } from "react-icons/gr";
 import styles from './Chatbot.module.css';
-
 import { API_BASE_URL } from "../../api";
+
 export default function Chatbot({ open, onClose }) {
   const [messages, setMessages] = useState([
-    { role:'assistant', content:"Hey! I'm your coding buddy. Ask me about Big-O, DSA ✨"}
+    { role:'assistant', content:"Hey! I'm your coding buddy. Ask me about Big-O, DSA "}
   ]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
@@ -44,8 +44,9 @@ export default function Chatbot({ open, onClose }) {
     <div className={styles.backdrop} onClick={onClose}>
       <div className={styles.sheet} onClick={(e)=>e.stopPropagation()}>
         <div className={styles.header}>
-          <strong>Assistant</strong>
+          <strong>Assistant </strong>
           <div className={styles.headerButtons}>
+            
             <button className={styles.iconBtn} onClick={()=>setMessages([
               { role:'assistant',content:"Hey! I'm your coding buddy. Ask me about Big-O, DSA, or this app ✨"}
             ])}>  <GrPowerReset /></button>

@@ -3,6 +3,8 @@ import './Navbar.css';
 import { ToastContainer } from 'react-toastify';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { handleSuccess } from '../../pages/utils';
+import { Sun, Moon, Bot} from 'lucide-react';
+
 
 const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
   const [hoveredLink, setHoveredLink] = useState(null);
@@ -64,8 +66,9 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
       </div>
 
       <div className="nav-right">
-        <button className="theme-toggle" onClick={toggleTheme}>
-          {isDark ? 'Light' : 'Dark'}
+        <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
+          {isDark ? <Sun size={18} /> : <Moon size={18} />}
+          <span className="theme-label">{isDark ? 'Light' : 'Dark'}</span>
         </button>
 
         {!isDashboard && (
@@ -75,6 +78,7 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
             onMouseEnter={() => setChatbotHovered(true)}
             onMouseLeave={() => setChatbotHovered(false)}
           >
+            <Bot size={18}/>
             Chatbot
           </div>
         )}
@@ -102,9 +106,14 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
             )}
           </div>
         ) : (
-          <button className="auth-btn signup-btn" onClick={() => navigate('/signup')}>
-            SignUp
-          </button>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button className="auth-btn login-btn" onClick={() => navigate('/login')}>
+              Login
+            </button>
+            <button className="auth-btn signup-btn" onClick={() => navigate('/signup')}>
+              SignUp
+            </button>
+          </div>
         )}
 
         <ToastContainer />

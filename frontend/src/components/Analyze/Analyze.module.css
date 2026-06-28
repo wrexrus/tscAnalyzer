@@ -90,6 +90,7 @@
   margin: 40px auto 0;
   padding: 12px 24px;
   border: 1px solid var(--text);
+  background: transparent;
   border-radius: 4px;
   color: var(--text);
   cursor: pointer;
