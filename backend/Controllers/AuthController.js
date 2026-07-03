@@ -1,6 +1,9 @@
 import bcrypt from "bcrypt";
 import UserModel from "../Models/User.js";
 import jwt from "jsonwebtoken";
+import { OAuth2Client } from 'google-auth-library';
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || 'PLACEHOLDER_CLIENT_ID');
 
 export const signup = async (req, res) => {
   try {
@@ -60,5 +63,43 @@ export const login = async (req, res) => {
       success: false,
       error: err?.message,
     });
+  }
+};
+
+export const googleAuth = async (req, res) => {
+  try {
+    const { token } = req.body;
+    const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: process.env.GOOGLE_CLIENT_ID || 'PLACEHOLDER_CLIENT_ID',
+    });
+    const payload = ticket.getPayload();
+    const { email, name, sub: googleId } = payload;
+    
+    let user = await UserModel.findOne({ email });
+    if (!user) {
+        user = new UserModel({ name, email, googleId });
+        await user.save();
+    } else if (!user.googleId) {
+        user.googleId = googleId;
+        await user.save();
+    }
+    
+    const jwtToken = jwt.sign(
+      { email: user.email, _id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+    
+    return res.status(200).json({
+      message: "Google Login Successful",
+      success: true,
+      jwtToken,
+      email: user.email,
+      name: user.name,
+    });
+  } catch (err) {
+    console.error("Google Auth error:", err);
+    return res.status(500).json({ message: "Google Auth Failed", success: false, error: err?.message });
   }
 };

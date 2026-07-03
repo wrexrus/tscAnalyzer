@@ -142,9 +142,29 @@
   transition: all 0.3s ease;
 }
 
-.quiz-next-btn:hover, .quiz-restart-btn:hover {
+.quiz-next-btn:hover, .quiz-restart-btn:hover, .quiz-quit-btn:hover {
   background: transparent;
   color: var(--primary);
+}
+
+.quiz-quit-btn {
+  padding: 8px 16px;
+  background: transparent;
+  color: #f44336;
+  border: 1px solid #f44336;
+  border-radius: 4px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-left: 20px;
+}
+
+.quiz-quit-btn:hover {
+  background: #f44336;
+  color: #fff;
 }
 
 .quiz-score-display {

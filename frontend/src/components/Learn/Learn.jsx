@@ -75,7 +75,7 @@ const Learn = () => {
         </div>
 
         {activeO && (
-          <div className="learn-explanation">{explanations[activeO]}</div>
+          <div className={`learn-explanation text-${tiers[activeO] || 'good'}`}>{explanations[activeO]}</div>
         )}
       </div>
 

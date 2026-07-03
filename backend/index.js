@@ -10,6 +10,7 @@ import AuthRouter from "./Routes/AuthRouter.js";
 import ChatRouter from "./Routes/ChatRouter.js";
 import AnalyzeRouter from "./Routes/AnalyzeRouter.js";
 import QuizRouter from "./Routes/QuizRouter.js";
+import rateLimit from "express-rate-limit";
 
 const app = express(); // initliaze
 
@@ -31,11 +32,17 @@ app.get("/", (_req, res) => {
 // router
 app.use("/auth", AuthRouter);
 
-app.use("/chat", ChatRouter);
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  message: { error: "Too many requests from this IP, please try again after 15 minutes." }
+});
 
-app.use("/analyze", AnalyzeRouter);
+app.use("/chat", apiLimiter, ChatRouter);
 
-app.use("/quiz", QuizRouter);
+app.use("/analyze", apiLimiter, AnalyzeRouter);
+
+app.use("/quiz", apiLimiter, QuizRouter);
 
 
 

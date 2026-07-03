@@ -38,3 +38,18 @@ export const sendMessageWithRetry = async (chat, message, retries = 3, delay = 2
     }
   }
 };
+
+export const sendMessageWithRetryStream = async (chat, message, retries = 3, delay = 2000) => {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const result = await chat.sendMessageStream(message);
+      return result;
+    } catch (error) {
+      if (error.status === 503 && attempt < retries) {
+        await new Promise((r) => setTimeout(r, delay));
+      } else {
+        throw error;
+      }
+    }
+  }
+};

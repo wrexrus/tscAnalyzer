@@ -134,7 +134,7 @@
   color: var(--text);
   margin-top: 20px;
   padding: 15px;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   line-height: 1.6;
   font-weight: 400;
   background: var(--bg);
@@ -146,3 +146,9 @@
   display: flex;
   justify-content: center;
 }
+
+.text-excellent { color: #10b981; border-color: #10b981; }
+.text-good { color: #84cc16; border-color: #84cc16; }
+.text-fair { color: #f59e0b; border-color: #f59e0b; }
+.text-bad { color: #ef4444; border-color: #ef4444; }
+.text-horrible { color: #9f1239; border-color: #9f1239; }

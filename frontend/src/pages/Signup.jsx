@@ -4,6 +4,8 @@ import './Signup.css'
 import { ToastContainer } from 'react-toastify';
 import { handleError, handleSuccess } from './utils';
 import { API_BASE_URL } from '../api';
+import { GoogleLogin } from '@react-oauth/google';
+
 const Signup = () => {
     const [signupInfo,setSignupInfo] = useState({
         name: '',
@@ -51,6 +53,34 @@ const Signup = () => {
         }
     }
 
+    const handleGoogleSuccess = async (credentialResponse) => {
+        try {
+            const url = `${API_BASE_URL}/auth/google`
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ token: credentialResponse.credential })
+            });
+            const result = await response.json();
+            const { success, message, jwtToken, name, error } = result;
+            if (success) {
+                handleSuccess(message);
+                localStorage.setItem('token', jwtToken);
+                localStorage.setItem('loggedInUser', name);
+                window.dispatchEvent(new Event('authChanged'));
+                setTimeout(() => {
+                    navigate('/');
+                }, 1000)
+            } else {
+                handleError(message || error);
+            }
+        } catch (err) {
+            handleError(err);
+        }
+    };
+
     return (
         <div className='container'>
             <div className="signup-container">
@@ -91,6 +121,15 @@ const Signup = () => {
                     </div>
 
                     <button className="btn">Sign Up</button>
+                    
+                    <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
+                        <GoogleLogin
+                            onSuccess={handleGoogleSuccess}
+                            onError={() => {
+                                handleError('Google Sign Up Failed');
+                            }}
+                        />
+                    </div>
 
                     <p className="redirect-text">
                         Already have an account? <Link style={{fontSize: "19px"}} to="/login" id='login'>Login</Link>

@@ -241,9 +241,14 @@ const QuizCard = () => {
     <div className={styles["quiz-card"]}>
       {!showScoreHelper ? (
         <>
-          <h3 className={styles["quiz-question"]}>
-            {currentIndex + 1}. {currentQuestion.text}
-          </h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%', maxWidth: '600px', marginBottom: '40px' }}>
+            <h3 className={styles["quiz-question"]} style={{ margin: 0, textAlign: 'left', flex: 1 }}>
+              {currentIndex + 1}. {currentQuestion.text}
+            </h3>
+            <button onClick={handleRestart} className={styles["quiz-quit-btn"]}>
+              Quit
+            </button>
+          </div>
 
           <div style={{ width: "100%", maxWidth: "600px" }}>
             {currentQuestion.options.map((opt, idx) => {

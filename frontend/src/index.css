@@ -31,6 +31,7 @@ html, body {
   transition: background 500ms ease, color 250ms ease;
   -webkit-font-smoothing: antialiased;
   scroll-behavior: smooth;
+  user-select: none;
 }
 
 h1, h2, h3, h4, h5, h6 {

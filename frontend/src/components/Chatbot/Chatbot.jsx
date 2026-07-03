@@ -2,10 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { GrPowerReset } from "react-icons/gr";
 import styles from './Chatbot.module.css';
 import { API_BASE_URL } from "../../api";
+import { X } from 'lucide-react';
 
 export default function Chatbot({ open, onClose }) {
   const [messages, setMessages] = useState([
-    { role:'assistant', content:"Hey! I'm your coding buddy. Ask me about Big-O, DSA "}
+    { role:'assistant', content:"Hey! I'm your coding buddy. Ask me about Big-O, DSA;"}
   ]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
@@ -26,16 +27,50 @@ export default function Chatbot({ open, onClose }) {
     setMessages(next);
     setInput('');
     setSending(true);
-    try{
+    try {
       const res=await fetch(`${API_BASE_URL}/chat`,{
         method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({ messages: next })
       });
-      const data=await res.json();
-      setMessages(prev=>[...prev,{ role:'assistant',content:data.reply||'No reply' }]);
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
+      let assistantReply = "";
+      
+      setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
+      setSending(false); 
+
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        if (value) {
+          const chunkStr = decoder.decode(value);
+          const lines = chunkStr.split('\n');
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const dataStr = line.slice(6);
+              if (dataStr === '[DONE]') {
+                done = true;
+                break;
+              }
+              try {
+                const parsed = JSON.parse(dataStr);
+                if (parsed.text) {
+                  assistantReply += parsed.text;
+                  setMessages(prev => {
+                    const newMessages = [...prev];
+                    newMessages[newMessages.length - 1].content = assistantReply;
+                    return newMessages;
+                  });
+                }
+              } catch (e) {}
+            }
+          }
+        }
+      }
     }catch(e){
       setMessages(prev=>[...prev,{ role:'assistant',content:'Server error' }]);
-    }finally{ 
       setSending(false);
     }
   };
@@ -48,9 +83,9 @@ export default function Chatbot({ open, onClose }) {
           <div className={styles.headerButtons}>
             
             <button className={styles.iconBtn} onClick={()=>setMessages([
-              { role:'assistant',content:"Hey! I'm your coding buddy. Ask me about Big-O, DSA, or this app ✨"}
+              { role:'assistant',content:"Hey! I'm your coding buddy. Ask me about Big-O, DSA;"}
             ])}>  <GrPowerReset /></button>
-            <button className={styles.iconBtn} onClick={onClose}>✕</button>
+            <button className={styles.iconBtn} onClick={onClose}><X /></button>
           </div>
         </div>
 
