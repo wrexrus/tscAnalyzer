@@ -44,7 +44,7 @@ const Learn = () => {
           onMouseEnter={() => setHoverHeading(true)}
           onMouseLeave={() => setHoverHeading(false)}
         >
-          <span className="heading-text default-text">Growth of Big O</span>
+          <span className="heading-text default-text" style={{fontSize:40}}>Growth of Big O</span>
           <span className="heading-text hover-text">The smaller the Big-O, the better the performance</span>
         </h2>
 

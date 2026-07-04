@@ -9,6 +9,7 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/ReactToastify.css';
 import { isExpired } from './pages/utils';
 
@@ -56,7 +57,7 @@ const App = () => {
   return (
     <>
       <div style={{ position: "relative", zIndex: 1 }}>
-
+        <ToastContainer />
         <Routes> 
           <Route path='/' element={
           <>

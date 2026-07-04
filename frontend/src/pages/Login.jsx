@@ -134,7 +134,6 @@ const Login = () => {
                         navigate('/');
                     }}> Home </span>
 
-                    <ToastContainer />
                 </div>
             </div>
         </>

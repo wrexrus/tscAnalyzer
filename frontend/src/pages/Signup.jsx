@@ -124,6 +124,7 @@ const Signup = () => {
                     
                     <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
                         <GoogleLogin
+                            text="signup_with"
                             onSuccess={handleGoogleSuccess}
                             onError={() => {
                                 handleError('Google Sign Up Failed');
@@ -141,7 +142,6 @@ const Signup = () => {
                     navigate('/');
                 }}> Home </span>
                 
-                <ToastContainer />
             </div>
         </div>
     )

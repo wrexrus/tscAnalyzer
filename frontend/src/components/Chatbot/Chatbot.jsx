@@ -13,6 +13,14 @@ export default function Chatbot({ open, onClose }) {
   const listRef = useRef(null);
 
   useEffect(()=>{
+    const handleAuthChange = () => {
+      setMessages([{ role:'assistant', content:"Hey! I'm your coding buddy. Ask me about Big-O, DSA;"}]);
+    };
+    window.addEventListener('authChanged', handleAuthChange);
+    return () => window.removeEventListener('authChanged', handleAuthChange);
+  }, []);
+
+  useEffect(()=>{
     if(open && listRef.current){
       listRef.current.scrollTop = listRef.current.scrollHeight;
     }
@@ -41,30 +49,40 @@ export default function Chatbot({ open, onClose }) {
       setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
       setSending(false); 
 
+      let buffer = "";
+
       while (!done) {
         const { value, done: readerDone } = await reader.read();
         done = readerDone;
         if (value) {
-          const chunkStr = decoder.decode(value);
-          const lines = chunkStr.split('\n');
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              const dataStr = line.slice(6);
-              if (dataStr === '[DONE]') {
-                done = true;
-                break;
-              }
-              try {
-                const parsed = JSON.parse(dataStr);
-                if (parsed.text) {
-                  assistantReply += parsed.text;
-                  setMessages(prev => {
-                    const newMessages = [...prev];
-                    newMessages[newMessages.length - 1].content = assistantReply;
-                    return newMessages;
-                  });
+          buffer += decoder.decode(value, { stream: true });
+          const parts = buffer.split('\n\n');
+          buffer = parts.pop(); // Keep the last incomplete part in the buffer
+          
+          for (const part of parts) {
+            const lines = part.split('\n');
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const dataStr = line.slice(6);
+                if (dataStr === '[DONE]') {
+                  done = true;
+                  break;
                 }
-              } catch (e) {}
+                try {
+                  const parsed = JSON.parse(dataStr);
+                  if (parsed.text) {
+                    for (const char of parsed.text) {
+                      assistantReply += char;
+                      setMessages(prev => {
+                        const newMessages = [...prev];
+                        newMessages[newMessages.length - 1].content = assistantReply;
+                        return newMessages;
+                      });
+                      await new Promise(r => setTimeout(r, 10));
+                    }
+                  }
+                } catch (e) {}
+              }
             }
           }
         }

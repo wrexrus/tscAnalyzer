@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styles from "./QuizCard.module.css";
 import axios from "axios";
 import { API_BASE_URL } from "../../api";
+import { handleError } from "../../pages/utils";
 
 const CATEGORIES = {
   "Linear Data Structures": [
@@ -64,9 +65,9 @@ const QuizCard = () => {
     } catch (error) {
       console.error("Error fetching questions:", error);
       if (error.response && error.response.status === 503) {
-        alert(error.response.data.error || "The AI model is currently experiencing high demand. Please wait a moment and try again!");
+        handleError(error.response.data.error || "The AI model is currently experiencing high demand. Please wait a moment and try again!");
       } else {
-        alert("Error generating questions. Please try again.");
+        handleError("Error generating questions. Please try again.");
       }
       setViewMode("topics"); 
     }

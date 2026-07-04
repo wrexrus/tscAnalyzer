@@ -10,7 +10,7 @@
   flex-direction: column;
   width: 420px;
   background: var(--card-bg);
-  padding: 3rem;
+  padding: 2rem;
   border: 1px solid var(--card-border);
   border-radius: 12px;
   box-shadow: var(--shadow);

@@ -21,13 +21,14 @@
 
 .learn-title {
   font-family: 'Playfair Display', serif;
-  font-size: 2.5rem;
+  font-size: 40px;
   font-weight: 600;
   margin-bottom: 25px;
   color: var(--text);
 }
 
 .learn-heading {
+  font-size: 40px;
   position: relative;
   height: 50px;
   margin-bottom: 30px;
