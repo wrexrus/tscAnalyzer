@@ -51,7 +51,7 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
             Home
           </a>
         ) : (
-          ['Home', 'Learn', 'Analyze'].map(item => (
+          ['Home', 'Learn', 'Analyze', 'Optimize'].map(item => (
             <a
               key={item}
               href={`#${item.toLowerCase()}`}

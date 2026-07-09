@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import ComplexityGraph from "../ComplexityGraph";  
-import styles from "./Analyze.module.css";
+import styles from "./Optimize.module.css";
 import { API_BASE_URL } from "../../api";
 import { handleError } from "../../pages/utils";
 
-const Analyze = () => {
+const Optimize = () => {
   const [code, setCode] = useState('');
   const [result, setResult] = useState(null);
   const [showResult, setShowResult] = useState(false);
@@ -30,7 +29,7 @@ const Analyze = () => {
     }
   }, [showResult]);
 
-  const handleAnalyze = async () => {
+  const handleOptimize = async () => {
     if (!code.trim()){
        handleError("No code provided");
        return;
@@ -44,7 +43,7 @@ const Analyze = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${API_BASE_URL}/analyze`, {
+      const res = await fetch(`${API_BASE_URL}/optimize`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -52,6 +51,7 @@ const Analyze = () => {
         },
         body: JSON.stringify({ code }),
       });
+      
       if (!res.ok) {
         if (res.status === 503) {
           handleError("The AI model is currently experiencing high demand. Please wait a moment and try again!");
@@ -126,29 +126,27 @@ const Analyze = () => {
   const isErrorFallback = result?.explanation?.startsWith("Error:");
 
   return (
-    <section id="analyze" className={styles.section}>
+    <section id="optimize" className={styles.section}>
       <div className={styles.container}>
         <div className={styles.card}>
-          <h1 className={styles.heading}>Analyze Code</h1>
+          <h1 className={styles.heading}>Optimize Code</h1>
           
-          {!isLoggedIn && (
-            <div style={{ textAlign: "center", marginBottom: "20px", color: "red", opacity: 0.7, fontStyle: "italic", fontSize: "1.1rem" }}>
-              * Do login to Save Report
-            </div>
-          )}
+          <div style={{ textAlign: "center", marginBottom: "20px", color: "var(--text)", opacity: 0.7, fontSize: "1.1rem" }}>
+            Identify bugs and get AI-optimized pseudo-code!
+          </div>
 
           {!showResult ? (
             <>
               <div className={styles.inputWrapper}>
                 <textarea
                   className={styles.textarea}
-                  placeholder="Drop your code!"
+                  placeholder="Drop your unoptimized or buggy code here!"
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
                 />
                 <button
                   className={`${styles.analyzeBtn} ${loading ? styles.analyzeBtnDisabled : ''}`}
-                  onClick={handleAnalyze}
+                  onClick={handleOptimize}
                   disabled={loading}
                   aria-busy={loading}
                   aria-live="polite"
@@ -160,27 +158,16 @@ const Analyze = () => {
                     />
                   )}
                   <span className={styles.btnLabel}>
-                    {loading ? "Analyzing…" : "Analyze"}
+                    {loading ? "Optimizing…" : "Optimize"}
                   </span>
                 </button>
               </div>
-              
-              {isLoggedIn && (
-                <div style={{ marginTop: "20px", display: "flex", justifyContent: "center" }}>
-                  <button 
-                    className={styles.analyzeBtn}
-                    onClick={() => window.location.href = '/dashboard?tab=history'}
-                  >
-                    Previous analysis
-                  </button>
-                </div>
-              )}
             </>
           ) : (
             <div className={styles.resultWrapper} ref={resultRef}>
               <div className={styles.codeBox}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--card-border)', paddingBottom: '10px', marginBottom: '15px' }}>
-                  <h4 className={styles.panelTitle} style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: 0 }}>Your Code</h4>
+                  <h4 className={styles.panelTitle} style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: 0 }}>Original Code</h4>
                   <button onClick={() => setIsCodeMaximized(!isCodeMaximized)} className={styles.toggleBtn}>
                     {isCodeMaximized ? 'Minimize' : 'Maximize'}
                   </button>
@@ -188,24 +175,35 @@ const Analyze = () => {
                 <pre className={`${styles.codePreview} ${isCodeMaximized ? styles.maximized : styles.minimized}`}>{code}</pre>
               </div>
 
-              <div className={styles.graphBox}>
+              <div className={styles.graphBox} style={{ marginTop: '20px' }}>
                 <h4 className={styles.panelTitle}>
-                  {isErrorFallback ? "Code Error" : "Complexity Explanation"}
+                  {isErrorFallback ? "Code Error" : "Optimization Results"}
                 </h4>
-                <p className={styles.explanation} style={{ whiteSpace: 'pre-wrap', color: isErrorFallback ? '#ff4d4f' : 'inherit' }}>
+                
+                {/* Use a pre block to perfectly preserve pseudocode indentations and formatting */}
+                <pre 
+                   className={styles.codePreview} 
+                   style={{ 
+                     whiteSpace: 'pre-wrap', 
+                     color: isErrorFallback ? '#ff4d4f' : 'inherit',
+                     fontFamily: 'inherit',
+                     fontSize: '15px',
+                     border: 'none',
+                     padding: '0'
+                   }}
+                >
                   {result?.explanation}
-                </p>
-                {!isErrorFallback && <ComplexityGraph explanation={result?.explanation} />}
+                </pre>
               </div>
 
-              <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+              <div style={{ display: "flex", gap: "10px", marginTop: "30px" }}>
                 <button 
                   className={styles.resetBtn} 
                   onClick={handleReset} 
                   style={{ flex: 1, opacity: loading ? 0.5 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
                   disabled={loading}
                 >
-                  Test New Code
+                  Optimize New Code
                 </button>
               </div>
             </div>
@@ -216,4 +214,4 @@ const Analyze = () => {
   );
 };
 
-export default Analyze;
+export default Optimize;
