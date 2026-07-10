@@ -153,3 +153,79 @@
 .text-fair { color: #f59e0b; border-color: #f59e0b; }
 .text-bad { color: #ef4444; border-color: #ef4444; }
 .text-horrible { color: #9f1239; border-color: #9f1239; }
+
+/* ========= CHEAT SHEET ========= */
+.cheat-sheet-table {
+  width: 100%;
+  border-collapse: separate; /* Use separate to allow border-radius on cells */
+  border-spacing: 0 10px; /* Space between rows */
+  margin-top: 20px;
+}
+
+.cheat-sheet-table th {
+  padding: 16px;
+  text-align: center;
+  font-family: "Inter", sans-serif;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 1.1rem;
+  border-bottom: 2px solid var(--card-border);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.cheat-sheet-table td {
+  padding: 16px;
+  text-align: center;
+  background: var(--card-bg);
+  border-top: 1px solid var(--card-border);
+  border-bottom: 1px solid var(--card-border);
+  transition: all 0.3s ease;
+}
+
+.cheat-sheet-table td:first-child {
+  border-left: 1px solid var(--card-border);
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+.cheat-sheet-table td:last-child {
+  border-right: 1px solid var(--card-border);
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.cheat-sheet-table tbody tr {
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.cheat-sheet-table tbody tr:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+  position: relative;
+}
+
+.cheat-sheet-table tbody tr:hover td {
+  background: var(--bg);
+  border-color: var(--primary);
+}
+
+.cs-cell {
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 6px;
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.cheat-sheet-table tbody tr:hover .cs-cell {
+  transform: scale(1.05);
+}
+
+.cs-excel { background: rgba(16,185,129,0.1); color: #10b981; }
+.cs-good { background: rgba(132,204,22,0.1); color: #84cc16; }
+.cs-fair { background: rgba(245,158,11,0.1); color: #f59e0b; }
+.cs-bad { background: rgba(239,68,68,0.1); color: #ef4444; }

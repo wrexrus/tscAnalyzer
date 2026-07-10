@@ -79,6 +79,68 @@ const Learn = () => {
         )}
       </div>
 
+      {/* ========= CHEAT SHEET ========= */}
+      <div className="learn-card">
+        <h2 className="learn-heading">Data Structures Cheat Sheet</h2>
+        <div style={{ overflowX: 'auto' }}>
+          <table className="cheat-sheet-table">
+            <thead>
+              <tr>
+                <th style={{ textAlign: 'left' }}>Data Structure</th>
+                <th>Access</th>
+                <th>Search</th>
+                <th>Insertion</th>
+                <th>Deletion</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style={{ textAlign: 'left', fontWeight: 600 }}>Array</td>
+                <td><span className="cs-cell cs-excel">O(1)</span></td>
+                <td><span className="cs-cell cs-bad">O(N)</span></td>
+                <td><span className="cs-cell cs-bad">O(N)</span></td>
+                <td><span className="cs-cell cs-bad">O(N)</span></td>
+              </tr>
+              <tr>
+                <td style={{ textAlign: 'left', fontWeight: 600 }}>Stack</td>
+                <td><span className="cs-cell cs-bad">O(N)</span></td>
+                <td><span className="cs-cell cs-bad">O(N)</span></td>
+                <td><span className="cs-cell cs-excel">O(1)</span></td>
+                <td><span className="cs-cell cs-excel">O(1)</span></td>
+              </tr>
+              <tr>
+                <td style={{ textAlign: 'left', fontWeight: 600 }}>Queue</td>
+                <td><span className="cs-cell cs-bad">O(N)</span></td>
+                <td><span className="cs-cell cs-bad">O(N)</span></td>
+                <td><span className="cs-cell cs-excel">O(1)</span></td>
+                <td><span className="cs-cell cs-excel">O(1)</span></td>
+              </tr>
+              <tr>
+                <td style={{ textAlign: 'left', fontWeight: 600 }}>Singly-Linked List</td>
+                <td><span className="cs-cell cs-bad">O(N)</span></td>
+                <td><span className="cs-cell cs-bad">O(N)</span></td>
+                <td><span className="cs-cell cs-excel">O(1)</span></td>
+                <td><span className="cs-cell cs-excel">O(1)</span></td>
+              </tr>
+              <tr>
+                <td style={{ textAlign: 'left', fontWeight: 600 }}>Hash Table</td>
+                <td><span className="cs-cell cs-excel">N/A</span></td>
+                <td><span className="cs-cell cs-excel">O(1)</span></td>
+                <td><span className="cs-cell cs-excel">O(1)</span></td>
+                <td><span className="cs-cell cs-excel">O(1)</span></td>
+              </tr>
+              <tr>
+                <td style={{ textAlign: 'left', fontWeight: 600 }}>Binary Search Tree</td>
+                <td><span className="cs-cell cs-good">O(log N)</span></td>
+                <td><span className="cs-cell cs-good">O(log N)</span></td>
+                <td><span className="cs-cell cs-good">O(log N)</span></td>
+                <td><span className="cs-cell cs-good">O(log N)</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       {/* ========= PRACTICE QUESTIONS ========= */}
       <div className="learn-card">
         <h2 className="learn-heading">Practice Questions</h2>

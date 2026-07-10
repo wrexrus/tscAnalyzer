@@ -23,6 +23,14 @@ function Home() {
 
   return (
     <section id="home" className="home-section">
+      {/* Floating Background Icons */}
+      <div className="floating-bg">
+        <span className="float-icon">{"{ }"}</span>
+        <span className="float-icon">{"</>"}</span>
+        <span className="float-icon">O(N)</span>
+        <span className="float-icon">{"[ ]"}</span>
+      </div>
+
       <h1 className="hero-text">{displayedText}</h1>
 
       <p className={`sub-text ${showSub ? "visible" : ""}`}>
@@ -32,6 +40,11 @@ function Home() {
       <h3 className={`tag-text ${showTag ? "visible" : ""}`}>
         Crack the code — before it cracks your runtime!
       </h3>
+
+      <div className={`cta-container ${showTag ? "visible" : ""}`}>
+        <a href="#analyze" className="cta-btn cta-primary">Start Analyzing</a>
+        <a href="#optimize" className="cta-btn cta-primary">Optimize Code</a>
+      </div>
     </section>
   );
 }
