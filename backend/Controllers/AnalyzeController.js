@@ -10,17 +10,20 @@ const analyze = async (req,res)=>{
         });
         const model = getGeminiModel();
         const prompt = 
-            `Analyze the following code.
+            `You are a Unified AI Code Engine. Analyze and optimize the following code.
             If the code contains syntax errors, is completely invalid, or is not programming code, return EXACTLY this structure:
             Error: <describe the syntax errors or explain why it is wrong>
 
-            Otherwise, if it is valid code, return the exact structure:
+            Otherwise, if it is valid code, return the exact structure (use exactly these labels):
             Language: <Programming Language>
             Time Complexity: <Big-O>
             Space Complexity: <Big-O>
             Topic: <Main topic or data structure, e.g., Arrays, Graph, Sorting>
             Difficulty: <Easy, Medium, or Hard>
-            Why: <6-7 line explanation with only relevant points>
+            Developer Level: <Beginner, Intermediate, or Pro>
+            Mistakes: <Mistake 1> | <Mistake 2> | <Mistake 3> (separate with pipe |)
+            Optimization: <Provide 2-3 sentences of optimization strategy, followed by optimized pseudo-code or code>
+            Why: <3-4 sentences explaining the core logic and why the time/space complexity is what it is>
 
             Code to analyze:
             ${code}`;
@@ -62,8 +65,16 @@ const analyze = async (req,res)=>{
            const spaceMatch = responseText.match(/Space Complexity:\s*(.*)/i);
            const topicMatch = responseText.match(/Topic:\s*(.*)/i);
            const difficultyMatch = responseText.match(/Difficulty:\s*(.*)/i);
+           const devLevelMatch = responseText.match(/Developer Level:\s*(.*)/i);
+           const mistakesMatch = responseText.match(/Mistakes:\s*(.*)/i);
+           const optMatch = responseText.match(/Optimization:\s*([\s\S]*?)Why:/i);
            
            try {
+             let parsedMistakes = [];
+             if (mistakesMatch) {
+                parsedMistakes = mistakesMatch[1].split('|').map(m => m.trim()).filter(m => m);
+             }
+
              await AnalysisHistory.create({
                 user: userId,
                 language: langMatch ? langMatch[1].trim() : "Unknown",
@@ -71,6 +82,9 @@ const analyze = async (req,res)=>{
                 spaceComplexity: spaceMatch ? spaceMatch[1].trim() : "Unknown",
                 topic: topicMatch ? topicMatch[1].trim() : "Unknown",
                 difficulty: difficultyMatch ? difficultyMatch[1].trim() : "Unknown",
+                developerLevel: devLevelMatch ? devLevelMatch[1].trim() : "Unknown",
+                mistakes: parsedMistakes,
+                optimization: optMatch ? optMatch[1].trim() : "",
                 explanation: responseText
              });
            } catch (dbErr) {

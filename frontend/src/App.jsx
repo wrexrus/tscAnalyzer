@@ -3,7 +3,6 @@ import Navbar from './components/Navbar/Navbar';
 import Home from './Home';
 import Learn from './components/Learn/Learn';
 import Analyze from './components/Analyze/Analyze';
-import Optimize from './components/Optimize/Optimize';
 import Chatbot from './components/Chatbot/Chatbot';
 import "./index.css";
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
@@ -72,7 +71,6 @@ const App = () => {
             <Home />
             <Learn />
             <Analyze />
-            <Optimize />
           </>
           }/>
           <Route path='/login' element={<Login />}/>

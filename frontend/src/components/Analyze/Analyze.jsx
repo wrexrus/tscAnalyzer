@@ -129,7 +129,7 @@ const Analyze = () => {
     <section id="analyze" className={styles.section}>
       <div className={styles.container}>
         <div className={styles.card}>
-          <h1 className={styles.heading}>Analyze Code</h1>
+          <h1 className={styles.heading}>Unified AI Code Engine</h1>
           
           {!isLoggedIn && (
             <div style={{ textAlign: "center", marginBottom: "20px", color: "red", opacity: 0.7, fontStyle: "italic", fontSize: "1.1rem" }}>

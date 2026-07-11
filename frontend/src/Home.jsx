@@ -42,8 +42,7 @@ function Home() {
       </h3>
 
       <div className={`cta-container ${showTag ? "visible" : ""}`}>
-        <a href="#analyze" className="cta-btn cta-primary">Start Analyzing</a>
-        <a href="#optimize" className="cta-btn cta-primary">Optimize Code</a>
+        <a href="#analyze" className="cta-btn cta-primary">Enter Unified Code Engine</a>
       </div>
     </section>
   );

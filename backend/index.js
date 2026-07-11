@@ -9,7 +9,6 @@ import "./Models/db.js";
 import AuthRouter from "./Routes/AuthRouter.js";
 import ChatRouter from "./Routes/ChatRouter.js";
 import AnalyzeRouter from "./Routes/AnalyzeRouter.js";
-import OptimizeRouter from "./Routes/OptimizeRouter.js";
 import QuizRouter from "./Routes/QuizRouter.js";
 import rateLimit from "express-rate-limit";
 
@@ -43,7 +42,6 @@ const apiLimiter = rateLimit({
 app.use("/chat", apiLimiter, ChatRouter);
 
 app.use("/analyze", apiLimiter, AnalyzeRouter);
-app.use("/optimize", apiLimiter, OptimizeRouter);
 
 app.use("/quiz", apiLimiter, QuizRouter);
 
