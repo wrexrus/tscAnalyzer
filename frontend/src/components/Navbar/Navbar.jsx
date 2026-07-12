@@ -51,15 +51,19 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
             Home
           </a>
         ) : (
-          ['Home', 'Learn', 'Analyze', 'Optimize'].map(item => (
+          [
+            { name: 'Home', id: 'home' },
+            { name: 'Learn', id: 'learn' },
+            { name: 'Unified Code', id: 'analyze' }
+          ].map(item => (
             <a
-              key={item}
-              href={`#${item.toLowerCase()}`}
-              className={`nav-link ${hoveredLink === item ? 'hovered' : ''}`}
-              onMouseEnter={() => setHoveredLink(item)}
+              key={item.name}
+              href={`#${item.id}`}
+              className={`nav-link ${hoveredLink === item.name ? 'hovered' : ''}`}
+              onMouseEnter={() => setHoveredLink(item.name)}
               onMouseLeave={() => setHoveredLink(null)}
             >
-              {item}
+              {item.name}
             </a>
           ))
         )}

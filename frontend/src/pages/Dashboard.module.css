@@ -210,6 +210,6 @@
   position: relative;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
-.heatmapLevel1 { background-color: rgba(16, 185, 129, 0.3); }
-.heatmapLevel2 { background-color: rgba(16, 185, 129, 0.6); }
-.heatmapLevel3 { background-color: rgba(16, 185, 129, 1); }
+.heatmapLevel1 { background-color: var(--heatmap-level-1); }
+.heatmapLevel2 { background-color: var(--heatmap-level-2); }
+.heatmapLevel3 { background-color: var(--heatmap-level-3); }

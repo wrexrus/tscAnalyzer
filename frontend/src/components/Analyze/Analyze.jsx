@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ComplexityGraph from "../ComplexityGraph";  
+import AstVisualizer from "../AstVisualizer/AstVisualizer";
+import ActionToolbar from "./ActionToolbar";
 import styles from "./Analyze.module.css";
 import { API_BASE_URL } from "../../api";
 import { handleError } from "../../pages/utils";
@@ -12,6 +14,10 @@ const Analyze = () => {
   const [progress, setProgress] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
   const [isCodeMaximized, setIsCodeMaximized] = useState(false);
+  const [astGraph, setAstGraph] = useState(null);
+  const [activeTab, setActiveTab] = useState('explanation');
+  const [mode, setMode] = useState('analyze');
+  const [targetLanguage, setTargetLanguage] = useState('Python');
   const resultRef = useRef(null);
 
   useEffect(() => {
@@ -30,11 +36,12 @@ const Analyze = () => {
     }
   }, [showResult]);
 
-  const handleAnalyze = async () => {
+  const handleAnalyze = async (selectedMode = 'analyze', customLang = null) => {
     if (!code.trim()){
        handleError("No code provided");
        return;
     }
+    const finalLang = customLang || targetLanguage;
     setLoading(true);
     setProgress(8);
 
@@ -50,7 +57,7 @@ const Analyze = () => {
           "Content-Type": "application/json",
           ...(token ? { "Authorization": token } : {})
         },
-        body: JSON.stringify({ code }),
+        body: JSON.stringify({ code, mode: selectedMode, targetLanguage: finalLang }),
       });
       if (!res.ok) {
         if (res.status === 503) {
@@ -60,7 +67,16 @@ const Analyze = () => {
         }
         return;
       }
-      
+      if (selectedMode === 'analyze') {
+        fetch(`${API_BASE_URL}/ast`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code })
+        }).then(r => r.json()).then(data => {
+          if (!data.error) setAstGraph(data);
+        }).catch(e => console.log("AST fetch failed or not JS/TS"));
+      }
+
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let done = false;
@@ -121,6 +137,8 @@ const Analyze = () => {
     setResult(null);
     setShowResult(false);
     setIsCodeMaximized(false);
+    setAstGraph(null);
+    setActiveTab('explanation');
   };
 
   const isErrorFallback = result?.explanation?.startsWith("Error:");
@@ -129,7 +147,7 @@ const Analyze = () => {
     <section id="analyze" className={styles.section}>
       <div className={styles.container}>
         <div className={styles.card}>
-          <h1 className={styles.heading}>Unified AI Code Engine</h1>
+          <h1 className={styles.heading}>Unified Code Engine</h1>
           
           {!isLoggedIn && (
             <div style={{ textAlign: "center", marginBottom: "20px", color: "red", opacity: 0.7, fontStyle: "italic", fontSize: "1.1rem" }}>
@@ -145,24 +163,19 @@ const Analyze = () => {
                   placeholder="Drop your code!"
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
+                  style={{ minHeight: '200px' }}
                 />
-                <button
-                  className={`${styles.analyzeBtn} ${loading ? styles.analyzeBtnDisabled : ''}`}
-                  onClick={handleAnalyze}
-                  disabled={loading}
-                  aria-busy={loading}
-                  aria-live="polite"
-                >
-                  {loading && (
-                    <span
-                      className={styles.progressFill}
-                      style={{ width: `${progress}%` }}
-                    />
-                  )}
-                  <span className={styles.btnLabel}>
-                    {loading ? "Analyzing…" : "Analyze"}
-                  </span>
-                </button>
+                
+                <ActionToolbar 
+                  code={code}
+                  mode={mode}
+                  setMode={setMode}
+                  targetLanguage={targetLanguage}
+                  setTargetLanguage={setTargetLanguage}
+                  onAction={handleAnalyze}
+                  loading={loading}
+                  progress={progress}
+                />
               </div>
               
               {isLoggedIn && (
@@ -189,13 +202,44 @@ const Analyze = () => {
               </div>
 
               <div className={styles.graphBox}>
-                <h4 className={styles.panelTitle}>
-                  {isErrorFallback ? "Code Error" : "Complexity Explanation"}
-                </h4>
-                <p className={styles.explanation} style={{ whiteSpace: 'pre-wrap', color: isErrorFallback ? '#ff4d4f' : 'inherit' }}>
-                  {result?.explanation}
-                </p>
-                {!isErrorFallback && <ComplexityGraph explanation={result?.explanation} />}
+                <div style={{ display: 'flex', gap: '15px', borderBottom: '1px solid var(--card-border)', marginBottom: '20px' }}>
+                  <h4 
+                    onClick={() => setActiveTab('explanation')} 
+                    style={{ cursor: 'pointer', paddingBottom: '10px', color: activeTab === 'explanation' ? 'var(--primary)' : 'var(--text)', borderBottom: activeTab === 'explanation' ? '2px solid var(--primary)' : 'none' }}
+                  >
+                    {isErrorFallback ? "Code Error" : "Unified Explanation"}
+                  </h4>
+                  {mode === 'analyze' && (
+                    <h4 
+                      onClick={() => setActiveTab('ast')} 
+                      style={{ cursor: 'pointer', paddingBottom: '10px', color: activeTab === 'ast' ? 'var(--primary)' : 'var(--text)', borderBottom: activeTab === 'ast' ? '2px solid var(--primary)' : 'none' }}
+                    >
+                      Compiler AST Graph
+                    </h4>
+                  )}
+                </div>
+
+                {activeTab === 'explanation' ? (
+                  <>
+                    <p className={styles.explanation} style={{ whiteSpace: 'pre-wrap', color: isErrorFallback ? '#ff4d4f' : 'inherit' }}>
+                      {result?.explanation}
+                    </p>
+                    {!isErrorFallback && mode === 'analyze' && <ComplexityGraph explanation={result?.explanation} />}
+                  </>
+                ) : (
+                  <>
+                    <p style={{ color: 'var(--text)', opacity: 0.8, marginBottom: '15px' }}>
+                      This is the actual Abstract Syntax Tree generated by parsing your code using a real compiler parser (@babel/parser), independent of the AI.
+                    </p>
+                    {astGraph ? (
+                      <AstVisualizer nodes={astGraph.nodes} edges={astGraph.edges} />
+                    ) : (
+                      <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text)', opacity: 0.6, border: '1px dashed var(--card-border)', borderRadius: '12px' }}>
+                        Loading AST... (Note: Only valid JS/TS is supported)
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
 
               <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>

@@ -154,31 +154,32 @@
   z-index: 1;
 }
 
-.analyzeBtn {
+.analyzeBtn, .actionBtn {
   position: relative;
-  padding: 14px 40px;
-  border: 1px solid var(--primary);
-  border-radius: 4px;
-  background: var(--primary);
-  color: var(--button-text);
-  font-family: 'Outfit', sans-serif;
-  font-size: 16px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  cursor: pointer;
   overflow: hidden;
-  transition: all 0.3s ease;
+  padding: 12px 24px;
+  background-color: var(--primary);
+  color: var(--button-text);
+  border: none;
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.3);
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
-.analyzeBtn:hover {
-  background: transparent;
-  color: var(--primary);
+.analyzeBtn:hover, .actionBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px -2px rgba(139, 92, 246, 0.4);
 }
 
-.analyzeBtnDisabled {
-  background: transparent;
-  color: var(--text);
-  border-color: var(--card-border);
+.analyzeBtnDisabled, .actionBtnDisabled {
+  background-color: var(--card-border);
   cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
   opacity: 0.6;
 }

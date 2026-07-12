@@ -1,16 +1,28 @@
 import jwt from 'jsonwebtoken';
 import AnalysisHistory from '../Models/AnalysisHistory.js';
 import { getGeminiModel, generateWithRetryStream } from '../Services/GeminiService.js';
+import asyncHandler from '../Middlewares/asyncHandler.js';
+import AppError from '../Utils/AppError.js';
+import { generateWithRetry } from '../Services/GeminiService.js';
 
-const analyze = async (req,res)=>{
-    try{
-        const { code } = req.body;
-        if(!code) return res.status(400).json({
-            error: "No code provided",
-        });
-        const model = getGeminiModel();
-        const prompt = 
-            `You are a Unified AI Code Engine. Analyze and optimize the following code.
+const analyze = asyncHandler(async (req, res, next) => {
+    const { code, mode = 'analyze', targetLanguage = 'Python' } = req.body;
+    if (!code) return next(new AppError("No code provided", 400));
+
+    let userId = null;
+    if (req.headers.authorization) {
+        try {
+            const decoded = jwt.verify(req.headers.authorization, process.env.JWT_SECRET);
+            userId = decoded._id;
+        } catch (err) {
+            console.log("Token verification failed in analyze");
+        }
+    }
+    const model = getGeminiModel();
+
+    let prompt = "";
+    if (mode === 'analyze') {
+        prompt = `You are a Unified AI Code Engine. Analyze and optimize the following code.
             If the code contains syntax errors, is completely invalid, or is not programming code, return EXACTLY this structure:
             Error: <describe the syntax errors or explain why it is wrong>
 
@@ -22,61 +34,79 @@ const analyze = async (req,res)=>{
             Difficulty: <Easy, Medium, or Hard>
             Developer Level: <Beginner, Intermediate, or Pro>
             Mistakes: <Mistake 1> | <Mistake 2> | <Mistake 3> (separate with pipe |)
-            Optimization: <Provide 2-3 sentences of optimization strategy, followed by optimized pseudo-code or code>
-            Why: <3-4 sentences explaining the core logic and why the time/space complexity is what it is>
+            Optimization: <Provide 2-3 sentences of optimization strategy>
+            Why: <3-4 sentences explaining the core logic>
 
             Code to analyze:
             ${code}`;
-        const payload = { contents: [{ role: "user",parts: [{ text: prompt }] }] };
-        const resultStream = await generateWithRetryStream(model, payload);
+    } else if (mode === 'optimize') {
+        prompt = `You are an expert Senior Software Engineer reviewing code.
+            Identify all performance bottlenecks, security flaws, and bad practices in the following code.
+            Provide the optimized, refactored code and briefly explain why it is better.
+            Start your response with:
+            **Performance Bottlenecks:**
+            
+            Code to optimize:
+            ${code}`;
+    } else if (mode === 'convert') {
+        prompt = `You are an expert polyglot developer. Translate the following code exactly into ${targetLanguage}.
+            Maintain the same logic, but use idiomatic ${targetLanguage} conventions.
+            Start your response with the translated code inside a markdown block.
+            
+            Code to convert:
+            ${code}`;
+    } else if (mode === 'test') {
+        prompt = `You are a strict technical interviewer. Based on the following code, generate 3 thought-provoking questions to test the user's understanding of what they just wrote.
+            Do NOT provide the answers. Just the questions. Make them challenging.
+            
+            Code:
+            ${code}`;
+    }
 
-        res.setHeader('Content-Type', 'text/event-stream');
-        res.setHeader('Cache-Control', 'no-cache');
-        res.setHeader('Connection', 'keep-alive');
-        // Tell express to flush headers immediately
-        if(res.flushHeaders) res.flushHeaders();
+    const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+    const resultStream = await generateWithRetryStream(model, payload);
 
-        let responseText = "";
-        
-        for await (const chunk of resultStream.stream) {
-            const chunkText = chunk.text();
-            responseText += chunkText;
-            res.write(`data: ${JSON.stringify({ text: chunkText })}\n\n`);
-        }
-        res.write('data: [DONE]\n\n');
-        res.end();
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    if (res.flushHeaders) res.flushHeaders();
 
-        // Background save
-        const authHeader = req.headers['authorization'];
-        let userId = null;
-        if (authHeader) {
-          try {
-             const decoded = jwt.verify(authHeader, process.env.JWT_SECRET);
-             userId = decoded._id;
-          } catch(e) {}
-        }
+    let responseText = "";
+    for await (const chunk of resultStream.stream) {
+        const chunkText = chunk.text();
+        responseText += chunkText;
+        res.write(`data: ${JSON.stringify({ text: chunkText })}\n\n`);
+    }
+    res.write('data: [DONE]\n\n');
+    res.end();
 
-        const isError = responseText.includes("Error:");
-        const isMissingFields = !responseText.includes("Language:") || !responseText.includes("Time Complexity:");
+    const isError = responseText.includes("Error:");
+    const isMissingFields = !responseText.includes("Language:") || !responseText.includes("Time Complexity:");
 
-        if (userId && responseText && !isError && !isMissingFields) {
-           const langMatch = responseText.match(/Language:\s*(.*)/i);
-           const timeMatch = responseText.match(/Time Complexity:\s*(.*)/i);
-           const spaceMatch = responseText.match(/Space Complexity:\s*(.*)/i);
-           const topicMatch = responseText.match(/Topic:\s*(.*)/i);
-           const difficultyMatch = responseText.match(/Difficulty:\s*(.*)/i);
-           const devLevelMatch = responseText.match(/Developer Level:\s*(.*)/i);
-           const mistakesMatch = responseText.match(/Mistakes:\s*(.*)/i);
-           const optMatch = responseText.match(/Optimization:\s*([\s\S]*?)Why:/i);
-           
-           try {
-             let parsedMistakes = [];
-             if (mistakesMatch) {
+    if (userId && responseText && !isError && !isMissingFields) {
+        let dbPayload = {
+            user: userId,
+            actionType: mode,
+            explanation: responseText
+        };
+
+        if (mode === 'analyze') {
+            const langMatch = responseText.match(/Language:\s*(.*)/i);
+            const timeMatch = responseText.match(/Time Complexity:\s*(.*)/i);
+            const spaceMatch = responseText.match(/Space Complexity:\s*(.*)/i);
+            const topicMatch = responseText.match(/Topic:\s*(.*)/i);
+            const difficultyMatch = responseText.match(/Difficulty:\s*(.*)/i);
+            const devLevelMatch = responseText.match(/Developer Level:\s*(.*)/i);
+            const mistakesMatch = responseText.match(/Mistakes:\s*(.*)/i);
+            const optMatch = responseText.match(/Optimization:\s*([\s\S]*?)Why:/i);
+
+            let parsedMistakes = [];
+            if (mistakesMatch) {
                 parsedMistakes = mistakesMatch[1].split('|').map(m => m.trim()).filter(m => m);
-             }
+            }
 
-             await AnalysisHistory.create({
-                user: userId,
+            dbPayload = {
+                ...dbPayload,
                 language: langMatch ? langMatch[1].trim() : "Unknown",
                 timeComplexity: timeMatch ? timeMatch[1].trim() : "Unknown",
                 spaceComplexity: spaceMatch ? spaceMatch[1].trim() : "Unknown",
@@ -84,21 +114,19 @@ const analyze = async (req,res)=>{
                 difficulty: difficultyMatch ? difficultyMatch[1].trim() : "Unknown",
                 developerLevel: devLevelMatch ? devLevelMatch[1].trim() : "Unknown",
                 mistakes: parsedMistakes,
-                optimization: optMatch ? optMatch[1].trim() : "",
-                explanation: responseText
-             });
-           } catch (dbErr) {
-             console.log("Failed to save analysis history:", dbErr);
-           }
+                optimization: optMatch ? optMatch[1].trim() : ""
+            };
+        } else if (mode === 'convert') {
+            dbPayload.topic = targetLanguage;
         }
-    }catch(error){
-        console.log("Error:",error);
-        if (error.status === 503) {
-            return res.status(503).json({ error: "The AI model is currently experiencing high demand. Please wait a moment and try again!" });
+
+        try {
+            await AnalysisHistory.create(dbPayload);
+        } catch (dbErr) {
+            console.log("Failed to save analysis history:", dbErr);
         }
-        return res.status(500).json({ error: "Internal Server error" });
     }
-};
+});
 
 export const myHistory = async (req, res) => {
   try {

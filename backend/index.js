@@ -10,9 +10,11 @@ import AuthRouter from "./Routes/AuthRouter.js";
 import ChatRouter from "./Routes/ChatRouter.js";
 import AnalyzeRouter from "./Routes/AnalyzeRouter.js";
 import QuizRouter from "./Routes/QuizRouter.js";
+import AstRouter from "./Routes/AstRouter.js";
 import rateLimit from "express-rate-limit";
+import errorHandler from "./Middlewares/errorHandler.js";
 
-const app = express(); // initliaze
+const app = express();
 
 app.use(express.json());
 
@@ -34,18 +36,18 @@ app.get("/", (_req, res) => {
 app.use("/auth", AuthRouter);
 
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  windowMs: 15 * 60 * 1000,
+  max: 100,
   message: { error: "Too many requests from this IP, please try again after 15 minutes." }
 });
 
 app.use("/chat", apiLimiter, ChatRouter);
-
 app.use("/analyze", apiLimiter, AnalyzeRouter);
-
+app.use("/ast", apiLimiter, AstRouter);
 app.use("/quiz", apiLimiter, QuizRouter);
 
-
+// Global Error Handling Middleware
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 

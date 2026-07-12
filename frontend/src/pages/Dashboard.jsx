@@ -238,14 +238,18 @@ const HistoryView = ({ data }) => {
 
   const topicCount = {};
   const complexityCount = {};
+  const actionCount = {};
   const allMistakes = [];
   let recentLevel = "Unknown";
   
   data.forEach((item, idx) => {
     const t = item.topic && item.topic !== "Unknown" ? item.topic : "General";
     const c = item.timeComplexity && item.timeComplexity !== "Unknown" ? item.timeComplexity : "N/A";
+    const a = item.actionType && item.actionType !== "unknown" ? item.actionType : "analyze";
+    
     topicCount[t] = (topicCount[t] || 0) + 1;
     complexityCount[c] = (complexityCount[c] || 0) + 1;
+    actionCount[a] = (actionCount[a] || 0) + 1;
 
     if (item.developerLevel && item.developerLevel !== 'Unknown' && recentLevel === 'Unknown') {
       recentLevel = item.developerLevel;
@@ -268,6 +272,7 @@ const HistoryView = ({ data }) => {
 
   const topicData = Object.keys(topicCount).map(key => ({ subject: key, A: topicCount[key], fullMark: Math.max(...Object.values(topicCount)) + 2 }));
   const complexityData = Object.keys(complexityCount).map(key => ({ name: key, count: complexityCount[key] }));
+  const actionData = Object.keys(actionCount).map(key => ({ name: key.charAt(0).toUpperCase() + key.slice(1), value: actionCount[key] }));
   const COLORS = ['#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899'];
 
   return (
@@ -318,22 +323,44 @@ const HistoryView = ({ data }) => {
             </BarChart>
           </ResponsiveContainer>
         </div>
+
+        <div style={{ flex: '1 1 300px', height: 250, background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '20px', borderRadius: '8px' }}>
+          <h4 style={{textAlign: 'center', marginBottom: '20px', color: 'var(--text)'}}>Tools Used</h4>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie data={actionData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value" label={({name, percent}) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                {actionData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip contentStyle={{backgroundColor: 'var(--card-bg)', borderColor: 'var(--card-border)', color: 'var(--text)'}} />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       <div className={styles.list}>
         {data.map((item, idx) => (
           <div key={idx} className={styles.card}>
             <div className={styles.cardHeader}>
-              <h4 className={styles.cardTitle}>{item.language} Code {item.topic && `(${item.topic})`}</h4>
+              <h4 className={styles.cardTitle}>
+                {item.actionType === 'convert' ? `Conversion to ${item.topic}` : 
+                 item.actionType === 'optimize' ? 'Optimization Request' : 
+                 item.actionType === 'test' ? 'Knowledge Test' : 
+                 `${item.language || 'Code'} Analysis`}
+              </h4>
               <span className={styles.date}>{new Date(item.createdAt).toLocaleDateString()}</span>
             </div>
-            <div className={styles.complexities}>
-              <div className={styles.badge}>⏱ {item.timeComplexity}</div>
-              <div className={styles.badge}>💾 {item.spaceComplexity}</div>
-              {item.difficulty && item.difficulty !== 'Unknown' && (
-                <div className={styles.badge} style={{background: 'var(--primary)', color: '#fff'}}>⭐ {item.difficulty}</div>
-              )}
-            </div>
+            
+            {item.actionType === 'analyze' && (
+              <div className={styles.complexities}>
+                <div className={styles.badge}>⏱ {item.timeComplexity}</div>
+                <div className={styles.badge}>💾 {item.spaceComplexity}</div>
+                {item.difficulty && item.difficulty !== 'Unknown' && (
+                  <div className={styles.badge} style={{background: 'var(--primary)', color: '#fff'}}>⭐ {item.difficulty}</div>
+                )}
+              </div>
+            )}
             {item.mistakes && item.mistakes.length > 0 && (
               <div style={{ marginTop: '15px', color: 'var(--text)' }}>
                 <strong style={{ opacity: 0.8 }}>Mistakes Found:</strong>
