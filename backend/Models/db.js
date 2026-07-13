@@ -2,12 +2,12 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv'; // 
 dotenv.config();  //  do this or import 'dotenv/config'; 
 
-console.log("MONGO_CONN:", process.env.MONGO_CONN);
+// console.log("MONGO_CONN:", process.env.MONGO_CONN);
 
 const mongo_url = process.env.MONGO_CONN;
 
 if (!mongo_url) {
-    console.error("MONGO_CONN is not defined in the .env file.");
+    // console.error("MONGO_CONN is not defined in the .env file.");
     process.exit(1); // Exit the process if the connection string is missing
 }
 

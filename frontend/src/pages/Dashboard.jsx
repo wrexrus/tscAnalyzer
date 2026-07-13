@@ -204,9 +204,9 @@ const ProgressView = ({ data }) => {
         <div style={{ flex: '1 1 300px', height: 250, background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '20px', borderRadius: '8px' }}>
             <h4 style={{textAlign: 'center', marginBottom: '20px', color: 'var(--text)'}}>Concept Grip (Radar)</h4>
             <ResponsiveContainer width="100%" height="100%">
-              <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
+              <RadarChart cx="50%" cy="50%" outerRadius="60%" data={radarData}>
                 <PolarGrid stroke="var(--card-border)" />
-                <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text)', fontSize: 12 }} />
+                <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text)', fontSize: 11 }} />
                 <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
                 <Radar name="Score" dataKey="A" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.6} />
                 <Tooltip contentStyle={{backgroundColor: 'var(--card-bg)', borderColor: 'var(--card-border)', color: 'var(--text)'}} />
@@ -236,20 +236,27 @@ const ProgressView = ({ data }) => {
 const HistoryView = ({ data }) => {
   if (data.length === 0) return <p className={styles.empty}>No analysis history found.</p>;
 
+  const filteredData = data.filter(item => {
+    const isAnalyze = !item.actionType || item.actionType === 'analyze';
+    const noErrors = !String(item.timeComplexity).toLowerCase().includes("error") &&
+                     !String(item.timeComplexity).toLowerCase().includes("n/a") &&
+                     !String(item.topic).toLowerCase().includes("error");
+    return isAnalyze && noErrors;
+  });
+
+  if (filteredData.length === 0) return <p className={styles.empty}>No clean analysis history found.</p>;
+
   const topicCount = {};
   const complexityCount = {};
-  const actionCount = {};
   const allMistakes = [];
   let recentLevel = "Unknown";
   
-  data.forEach((item, idx) => {
+  filteredData.forEach((item, idx) => {
     const t = item.topic && item.topic !== "Unknown" ? item.topic : "General";
     const c = item.timeComplexity && item.timeComplexity !== "Unknown" ? item.timeComplexity : "N/A";
-    const a = item.actionType && item.actionType !== "unknown" ? item.actionType : "analyze";
     
     topicCount[t] = (topicCount[t] || 0) + 1;
     complexityCount[c] = (complexityCount[c] || 0) + 1;
-    actionCount[a] = (actionCount[a] || 0) + 1;
 
     if (item.developerLevel && item.developerLevel !== 'Unknown' && recentLevel === 'Unknown') {
       recentLevel = item.developerLevel;
@@ -272,7 +279,6 @@ const HistoryView = ({ data }) => {
 
   const topicData = Object.keys(topicCount).map(key => ({ subject: key, A: topicCount[key], fullMark: Math.max(...Object.values(topicCount)) + 2 }));
   const complexityData = Object.keys(complexityCount).map(key => ({ name: key, count: complexityCount[key] }));
-  const actionData = Object.keys(actionCount).map(key => ({ name: key.charAt(0).toUpperCase() + key.slice(1), value: actionCount[key] }));
   const COLORS = ['#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899'];
 
   return (
@@ -302,9 +308,9 @@ const HistoryView = ({ data }) => {
         <div style={{ flex: '1 1 300px', height: 250, background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '20px', borderRadius: '8px' }}>
           <h4 style={{textAlign: 'center', marginBottom: '20px', color: 'var(--text)'}}>Skill Radar</h4>
           <ResponsiveContainer width="100%" height="100%">
-            <RadarChart cx="50%" cy="50%" outerRadius="80%" data={topicData}>
+            <RadarChart cx="50%" cy="50%" outerRadius="60%" data={topicData}>
               <PolarGrid stroke="var(--card-border)" />
-              <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text)', fontSize: 12 }} />
+              <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text)', fontSize: 11 }} />
               <PolarRadiusAxis angle={30} domain={[0, 'auto']} tick={false} axisLine={false} />
               <Radar name="Analyzed" dataKey="A" stroke="#10b981" fill="#10b981" fillOpacity={0.6} />
               <Tooltip contentStyle={{backgroundColor: 'var(--card-bg)', borderColor: 'var(--card-border)', color: 'var(--text)'}} />
@@ -315,52 +321,39 @@ const HistoryView = ({ data }) => {
         <div style={{ flex: '1 1 300px', height: 250, background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '20px', borderRadius: '8px' }}>
           <h4 style={{textAlign: 'center', marginBottom: '20px', color: 'var(--text)'}}>Time Complexities Used</h4>
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={complexityData}>
-              <XAxis dataKey="name" stroke="var(--text)" />
+            <BarChart data={complexityData} margin={{ bottom: 40 }}>
+              <XAxis 
+                dataKey="name" 
+                stroke="var(--text)" 
+                tick={{ fontSize: 11, angle: -45, textAnchor: 'end' }} 
+                interval={0}
+              />
               <YAxis stroke="var(--text)" />
               <Tooltip cursor={{fill: 'var(--bg)'}} contentStyle={{backgroundColor: 'var(--card-bg)', borderColor: 'var(--card-border)', color: 'var(--text)'}} />
               <Bar dataKey="count" fill="#84cc16" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
-
-        <div style={{ flex: '1 1 300px', height: 250, background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '20px', borderRadius: '8px' }}>
-          <h4 style={{textAlign: 'center', marginBottom: '20px', color: 'var(--text)'}}>Tools Used</h4>
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie data={actionData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value" label={({name, percent}) => `${name} ${(percent * 100).toFixed(0)}%`}>
-                {actionData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip contentStyle={{backgroundColor: 'var(--card-bg)', borderColor: 'var(--card-border)', color: 'var(--text)'}} />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
       </div>
 
       <div className={styles.list}>
-        {data.map((item, idx) => (
+        {filteredData.map((item, idx) => (
           <div key={idx} className={styles.card}>
             <div className={styles.cardHeader}>
               <h4 className={styles.cardTitle}>
-                {item.actionType === 'convert' ? `Conversion to ${item.topic}` : 
-                 item.actionType === 'optimize' ? 'Optimization Request' : 
-                 item.actionType === 'test' ? 'Knowledge Test' : 
-                 `${item.language || 'Code'} Analysis`}
+                {item.language} Code {item.topic && `(${item.topic})`}
               </h4>
               <span className={styles.date}>{new Date(item.createdAt).toLocaleDateString()}</span>
             </div>
             
-            {item.actionType === 'analyze' && (
-              <div className={styles.complexities}>
-                <div className={styles.badge}>⏱ {item.timeComplexity}</div>
-                <div className={styles.badge}>💾 {item.spaceComplexity}</div>
-                {item.difficulty && item.difficulty !== 'Unknown' && (
-                  <div className={styles.badge} style={{background: 'var(--primary)', color: '#fff'}}>⭐ {item.difficulty}</div>
-                )}
-              </div>
-            )}
+            <div className={styles.complexities}>
+              <div className={styles.badge}>⏱ {item.timeComplexity}</div>
+              <div className={styles.badge}>💾 {item.spaceComplexity}</div>
+              {item.difficulty && item.difficulty !== 'Unknown' && (
+                <div className={styles.badge} style={{background: 'var(--primary)', color: '#fff'}}>⭐ {item.difficulty}</div>
+              )}
+            </div>
+            
             {item.mistakes && item.mistakes.length > 0 && (
               <div style={{ marginTop: '15px', color: 'var(--text)' }}>
                 <strong style={{ opacity: 0.8 }}>Mistakes Found:</strong>
