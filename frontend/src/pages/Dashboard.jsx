@@ -6,6 +6,7 @@ import axios from 'axios';
 import { Bot } from 'lucide-react';
 import { API_BASE_URL } from '../api';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
+import ReactMarkdown from 'react-markdown';
 
 const Dashboard = ({ theme, toggleTheme, onBotClick }) => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -107,7 +108,7 @@ const Dashboard = ({ theme, toggleTheme, onBotClick }) => {
             </button>
             {aiReview && (
               <div className={styles.aiResponse}>
-                {aiReview}
+                <ReactMarkdown>{aiReview}</ReactMarkdown>
               </div>
             )}
           </div>

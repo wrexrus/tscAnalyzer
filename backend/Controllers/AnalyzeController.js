@@ -1,13 +1,12 @@
 import jwt from 'jsonwebtoken';
 import AnalysisHistory from '../Models/AnalysisHistory.js';
-import { getGeminiModel, generateWithRetryStream } from '../Services/GeminiService.js';
+import { getGeminiModel, generateWithRetryStream, generateWithRetry } from '../Services/GeminiService.js';
 import asyncHandler from '../Middlewares/asyncHandler.js';
-import AppError from '../Utils/AppError.js';
-import { generateWithRetry } from '../Services/GeminiService.js';
+import { getStrategy } from '../Services/AnalyzeStrategies/StrategyFactory.js';
+
 
 const analyze = asyncHandler(async (req, res, next) => {
     const { code, mode = 'analyze', targetLanguage = 'Python' } = req.body;
-    if (!code) return next(new AppError("No code provided", 400));
 
     let userId = null;
     if (req.headers.authorization) {
@@ -18,54 +17,16 @@ const analyze = asyncHandler(async (req, res, next) => {
             console.log("Token verification failed in analyze");
         }
     }
+
+    const strategy = getStrategy(mode);
+
+    const prompt = strategy.getPrompt(code, targetLanguage);
+
     const model = getGeminiModel();
-
-    let prompt = "";
-    if (mode === 'analyze') {
-        prompt = `You are a Unified AI Code Engine. Analyze and optimize the following code.
-            If the code contains syntax errors, is completely invalid, or is not programming code, return EXACTLY this structure:
-            Error: <describe the syntax errors or explain why it is wrong>
-
-            Otherwise, if it is valid code, return the exact structure (use exactly these labels):
-            Language: <Programming Language>
-            Time Complexity: <Big-O>
-            Space Complexity: <Big-O>
-            Topic: <Main topic or data structure, e.g., Arrays, Graph, Sorting>
-            Difficulty: <Easy, Medium, or Hard>
-            Developer Level: <Beginner, Intermediate, or Pro>
-            Mistakes: <Mistake 1> | <Mistake 2> | <Mistake 3> (separate with pipe |)
-            Optimization: <Provide 2-3 sentences of optimization strategy>
-            Why: <3-4 sentences explaining the core logic>
-
-            Code to analyze:
-            ${code}`;
-    } else if (mode === 'optimize') {
-        prompt = `You are an expert Senior Software Engineer reviewing code.
-            Identify all performance bottlenecks, security flaws, and bad practices in the following code.
-            Provide the optimized, refactored code and briefly explain why it is better.
-            Start your response with:
-            **Performance Bottlenecks:**
-            
-            Code to optimize:
-            ${code}`;
-    } else if (mode === 'convert') {
-        prompt = `You are an expert polyglot developer. Translate the following code exactly into ${targetLanguage}.
-            Maintain the same logic, but use idiomatic ${targetLanguage} conventions.
-            Start your response with the translated code inside a markdown block.
-            
-            Code to convert:
-            ${code}`;
-    } else if (mode === 'test') {
-        prompt = `You are a strict technical interviewer. Based on the following code, generate 3 thought-provoking questions to test the user's understanding of what they just wrote.
-            Do NOT provide the answers. Just the questions. Make them challenging.
-            
-            Code:
-            ${code}`;
-    }
-
     const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
     const resultStream = await generateWithRetryStream(model, payload);
 
+    // Server-Sent Events (SSE) to stream the response
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
@@ -80,46 +41,9 @@ const analyze = asyncHandler(async (req, res, next) => {
     res.write('data: [DONE]\n\n');
     res.end();
 
-    const isError = responseText.includes("Error:");
-    const isMissingFields = !responseText.includes("Language:") || !responseText.includes("Time Complexity:");
-
-    if (userId && responseText && !isError && !isMissingFields) {
-        let dbPayload = {
-            user: userId,
-            actionType: mode,
-            explanation: responseText
-        };
-
-        if (mode === 'analyze') {
-            const langMatch = responseText.match(/Language:\s*(.*)/i);
-            const timeMatch = responseText.match(/Time Complexity:\s*(.*)/i);
-            const spaceMatch = responseText.match(/Space Complexity:\s*(.*)/i);
-            const topicMatch = responseText.match(/Topic:\s*(.*)/i);
-            const difficultyMatch = responseText.match(/Difficulty:\s*(.*)/i);
-            const devLevelMatch = responseText.match(/Developer Level:\s*(.*)/i);
-            const mistakesMatch = responseText.match(/Mistakes:\s*(.*)/i);
-            const optMatch = responseText.match(/Optimization:\s*([\s\S]*?)Why:/i);
-
-            let parsedMistakes = [];
-            if (mistakesMatch) {
-                parsedMistakes = mistakesMatch[1].split('|').map(m => m.trim()).filter(m => m);
-            }
-
-            dbPayload = {
-                ...dbPayload,
-                language: langMatch ? langMatch[1].trim() : "Unknown",
-                timeComplexity: timeMatch ? timeMatch[1].trim() : "Unknown",
-                spaceComplexity: spaceMatch ? spaceMatch[1].trim() : "Unknown",
-                topic: topicMatch ? topicMatch[1].trim() : "Unknown",
-                difficulty: difficultyMatch ? difficultyMatch[1].trim() : "Unknown",
-                developerLevel: devLevelMatch ? devLevelMatch[1].trim() : "Unknown",
-                mistakes: parsedMistakes,
-                optimization: optMatch ? optMatch[1].trim() : ""
-            };
-        } else if (mode === 'convert') {
-            dbPayload.topic = targetLanguage;
-        }
-
+    if (userId && responseText && strategy.isValidResponse(responseText)) {
+        const dbPayload = strategy.formatDbPayload(userId, responseText, code, targetLanguage);
+        
         try {
             await AnalysisHistory.create(dbPayload);
         } catch (dbErr) {
@@ -149,9 +73,16 @@ export const aiReview = async (req, res) => {
     
     const model = getGeminiModel();
     const prompt = `You are an expert computer science tutor. Analyze the following recent coding history for a student. 
-    Note the languages they use, the topics they practice, their difficulty level, and their average time complexities. 
-    Provide 1 specific, actionable tip on how they can write more optimal code or what topics they should practice next based on their weaknesses.
-    Keep it encouraging and strictly under 5 sentences.
+    Based on their weaknesses, provide a highly structured, actionable learning plan formatted in Markdown.
+    
+    Include exactly these sections:
+    ### 🎯 Focus Area For Today
+    (Identify their weakest topic or highest time complexity and explain exactly WHY they should focus on it).
+    
+    ### 💡 Quick Tip
+    (Provide a 2-sentence actionable rule of thumb related to their focus area, e.g., 'If you see nested loops, think Hash Map').
+
+    Keep the entire response encouraging and under 150 words.
     
     Data:
     ${dataString}`;

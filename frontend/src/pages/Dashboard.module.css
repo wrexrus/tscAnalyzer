@@ -101,7 +101,16 @@
   color: var(--text);
   line-height: 1.6;
   font-size: 1rem;
-  white-space: pre-wrap;
+}
+.aiResponse h3 {
+  margin-top: 15px;
+  margin-bottom: 5px;
+  font-family: 'Playfair Display', serif;
+  color: var(--primary);
+  font-size: 1.2rem;
+}
+.aiResponse h3:first-child {
+  margin-top: 0;
 }
 .list {
   display: flex;
