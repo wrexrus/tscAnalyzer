@@ -3,7 +3,7 @@ import './Navbar.css';
 import { ToastContainer } from 'react-toastify';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { handleSuccess } from '../../pages/utils';
-import { Sun, Moon, Bot} from 'lucide-react';
+import { Sun, Moon, Bot, Menu, X } from 'lucide-react';
 
 
 const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
@@ -12,6 +12,7 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
   const isDark = currentTheme === "dark";
   const [loggedInUser, setLoggedInUser] = useState(localStorage.getItem('loggedInUser'));
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const isDashboard = location.pathname === '/dashboard';
@@ -69,7 +70,31 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
         )}
       </div>
 
-      <div className="nav-right">
+      {/* Hamburger Icon for Mobile */}
+      <div className="hamburger" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+        {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+      </div>
+
+      <div className={`nav-right ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
+        {/* On mobile, close menu when clicking inside nav-right items */}
+        {isMobileMenuOpen && (
+          <div className="mobile-nav-links">
+            {isDashboard ? (
+              <a onClick={() => { navigate('/'); setIsMobileMenuOpen(false); }} className="nav-link">Home</a>
+            ) : (
+              [
+                { name: 'Home', id: 'home' },
+                { name: 'Learn', id: 'learn' },
+                { name: 'Unified Code', id: 'analyze' }
+              ].map(item => (
+                <a key={item.name} href={`#${item.id}`} className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+                  {item.name}
+                </a>
+              ))
+            )}
+          </div>
+        )}
+
         <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
           {isDark ? <Sun size={18} /> : <Moon size={18} />}
           <span className="theme-label">{isDark ? 'Light' : 'Dark'}</span>

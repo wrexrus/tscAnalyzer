@@ -182,3 +182,61 @@
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+.hamburger {
+  display: none;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.mobile-nav-links {
+  display: none;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 16px 20px;
+  }
+  
+  .nav-left {
+    display: none; /* Hide main links on mobile */
+  }
+  
+  .hamburger {
+    display: block; /* Show hamburger */
+  }
+  
+  .nav-right {
+    display: none; /* Hide entire right section normally */
+  }
+  
+  .nav-right.mobile-open {
+    display: flex;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: var(--card-bg);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    border-bottom: 1px solid var(--card-border);
+    animation: fadeInDown 0.2s ease;
+  }
+  
+  .mobile-nav-links {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 15px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--card-border);
+    padding-bottom: 20px;
+  }
+  
+  .mobile-nav-links .nav-link {
+    width: 100%;
+  }
+}

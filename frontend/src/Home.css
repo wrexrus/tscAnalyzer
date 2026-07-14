@@ -123,6 +123,11 @@
 }
 
 @media (max-width: 768px) {
+  .home-section {
+    padding: 20px;
+    height: auto;
+    min-height: 90vh;
+  }
   .hero-text {
     font-size: 2.4rem;
   }
@@ -135,5 +140,10 @@
   .cta-container {
     flex-direction: column;
     gap: 15px;
+    width: 100%;
+  }
+  .cta-btn {
+    width: 100%;
+    box-sizing: border-box;
   }
 }

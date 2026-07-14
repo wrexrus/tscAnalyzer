@@ -213,3 +213,32 @@
 .heatmapLevel1 { background-color: var(--heatmap-level-1); }
 .heatmapLevel2 { background-color: var(--heatmap-level-2); }
 .heatmapLevel3 { background-color: var(--heatmap-level-3); }
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .content {
+    flex-direction: column;
+  }
+  .mainPanel, .aiPanel {
+    width: 100%;
+    flex: unset;
+  }
+  .aiPanel {
+    position: static;
+  }
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  .tabs {
+    flex-wrap: wrap;
+  }
+  .tabBtn {
+    flex: 1;
+    text-align: center;
+  }
+  .complexities {
+    flex-wrap: wrap;
+  }
+}

@@ -46,3 +46,19 @@ h1, h2, h3, h4, h5, h6 {
 * {
   transition: background-color 500ms ease, color 200ms ease, border-color 500ms ease;
 }
+
+/* Global Responsive Adjustments */
+@media (max-width: 768px) {
+  html, body {
+    font-size: 14px; /* Scale down base font on mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  h1 { font-size: 2rem !important; }
+  h2 { font-size: 1.5rem !important; }
+  h3 { font-size: 1.25rem !important; }
+  html, body {
+    font-size: 13px;
+  }
+}

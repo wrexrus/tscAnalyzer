@@ -15,7 +15,7 @@
 .card {
   border: 1px solid var(--card-border);
   background: var(--card-bg);
-  border-radius: 4px; /* Classy sharp edges */
+  border-radius: 4px;
   padding: 50px 40px;
   box-shadow: var(--shadow);
 }
@@ -182,4 +182,24 @@
   transform: none !important;
   box-shadow: none !important;
   opacity: 0.6;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .card {
+    padding: 30px 20px;
+  }
+  .heading {
+    font-size: 2rem;
+  }
+  .actionBtn, .analyzeBtn {
+    width: 100%;
+    margin-bottom: 5px;
+    text-align: center;
+    justify-content: center;
+  }
+  .toolbarContainer {
+    flex-direction: column;
+    width: 100%;
+  }
 }
