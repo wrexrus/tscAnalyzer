@@ -12,6 +12,7 @@ import Dashboard from './pages/Dashboard';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/ReactToastify.css';
 import { isExpired } from './pages/utils';
+import { Analytics } from "@vercel/analytics/react"
 
 const THEME_KEY = "themePreference";
 
@@ -58,6 +59,7 @@ const App = () => {
     <>
       <div style={{ position: "relative", zIndex: 1 }}>
         <ToastContainer />
+        <Analytics />
         <Routes> 
           <Route path='/' element={
           <>

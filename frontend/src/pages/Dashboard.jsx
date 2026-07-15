@@ -11,6 +11,7 @@ import ReactMarkdown from 'react-markdown';
 const Dashboard = ({ theme, toggleTheme, onBotClick }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'progress');
   const [progressData, setProgressData] = useState([]);
   const [historyData, setHistoryData] = useState([]);

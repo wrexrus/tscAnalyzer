@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./Home.css"; // <-- IMPORT CSS
+import "./Home.css"; 
 
 function Home() {
   const mainText = "Think faster. Code smarter.";
@@ -23,7 +23,7 @@ function Home() {
 
   return (
     <section id="home" className="home-section">
-      {/* Floating Background Icons */}
+      {/* Background Icons */}
       <div className="floating-bg">
         <span className="float-icon">{"{ }"}</span>
         <span className="float-icon">{"</>"}</span>
