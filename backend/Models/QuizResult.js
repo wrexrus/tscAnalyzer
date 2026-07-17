@@ -13,4 +13,7 @@ const QuizResultSchema = new mongoose.Schema({
   totalQuestions: { type: Number, required: true },
 }, { timestamps: true });
 
+// Same reason as AnalysisHistory — index makes per-user queries O(log n) not O(n)
+QuizResultSchema.index({ user: 1, createdAt: -1 });
+
 export default mongoose.model('quiz_results', QuizResultSchema);

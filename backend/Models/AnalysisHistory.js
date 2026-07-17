@@ -18,4 +18,8 @@ const AnalysisHistorySchema = new mongoose.Schema({
   optimization: { type: String }
 }, { timestamps: true });
 
+// With an index, MongoDB jumps directly to
+// the matching documents in O(log n) time — massively faster as data grows.
+AnalysisHistorySchema.index({ user: 1, createdAt: -1 });
+
 export default mongoose.model('analysis_histories', AnalysisHistorySchema);

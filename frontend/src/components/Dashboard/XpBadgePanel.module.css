@@ -1,0 +1,164 @@
+
+.wrapper {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 30px;
+  box-shadow: var(--shadow);
+}
+
+/* ── XP & Level row ── */
+.xpSection {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.xpLeft {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--primary);
+  color: var(--button-text);
+  border-radius: 12px;
+  padding: 16px 24px;
+  min-width: 110px;
+}
+
+.levelLabel {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+  font-family: 'Outfit', sans-serif;
+}
+
+.levelName {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.xpRight {
+  flex: 1;
+  min-width: 180px;
+}
+
+.xpCount {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text);
+  font-family: 'Playfair Display', serif;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.xpSubtext {
+  color: var(--text);
+  opacity: 0.6;
+  font-size: 0.9rem;
+  margin: 0 0 10px;
+}
+
+/* Level progress bar */
+.progressTrack {
+  background: rgba(128, 128, 128, 0.15);
+  border-radius: 99px;
+  height: 10px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 99px;
+  transition: width 0.8s ease;
+}
+
+/* ── Badges section ── */
+.badgesHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.badgesTitle {
+  font-family: 'Playfair Display', serif;
+  color: var(--text);
+  font-size: 1.15rem;
+  margin: 0;
+}
+
+.badgesCount {
+  color: var(--text);
+  opacity: 0.55;
+  font-size: 0.85rem;
+}
+
+/* Grid: auto-fill at min 130px per badge card */
+.badgesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+}
+
+/* Individual badge card */
+.badgeCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  text-align: center;
+  cursor: default;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.badgeCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+}
+
+/* Earned badge — colourful */
+.earned {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(16, 185, 129, 0.08));
+  border-color: rgba(139, 92, 246, 0.4);
+}
+
+/* Locked badge — greyed out */
+.locked {
+  opacity: 0.4;
+  filter: grayscale(1);
+}
+
+.badgeEmoji {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.badgeName {
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.85rem;
+  font-family: 'Outfit', sans-serif;
+}
+
+.badgeDesc {
+  color: var(--text);
+  opacity: 0.6;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 480px) {
+  .xpSection  { flex-direction: column; align-items: flex-start; }
+  .xpLeft     { width: 100%; flex-direction: row; justify-content: space-between; }
+  .badgesGrid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+}

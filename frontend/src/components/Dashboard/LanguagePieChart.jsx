@@ -32,10 +32,10 @@ const LanguagePieChart = ({ data }) => {
   if (chartData.length === 0) return null;
 
   return (
-    <div style={{ flex: '1 1 300px', height: 280, background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '20px', borderRadius: '8px' }}>
-      <h4 style={{ textAlign: 'center', marginBottom: '10px', color: 'var(--text)' }}>
+    <div style={{ flex: '1 1 300px', height: 280, background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '40px', borderRadius: '8px' }}>
+      <h3 style={{ textAlign: 'center', marginBottom: '10px', color: 'var(--text)' }}>
         Language Distribution
-      </h4>
+      </h3>
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie

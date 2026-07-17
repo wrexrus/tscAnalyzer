@@ -45,7 +45,28 @@ const analyze = asyncHandler(async (req, res, next) => {
         const dbPayload = strategy.formatDbPayload(userId, responseText, code, targetLanguage);
         
         try {
+            // Save the new analysis record
             await AnalysisHistory.create(dbPayload);
+
+            // Rolling Cap: keep max 50 records per user 
+            // WHY: Without a cap, a power user could store thousands of records,
+            // bloating the DB and slowing every query
+            
+            const totalRecords = await AnalysisHistory.countDocuments({ user: userId });
+            const MAX_RECORDS  = 50;
+
+            if (totalRecords > MAX_RECORDS) {
+                // Find oldest records that are beyond the limit and delete them
+                const overflow = totalRecords - MAX_RECORDS;
+                const oldest = await AnalysisHistory
+                    .find({ user: userId })
+                    .sort({ createdAt: 1 })  // ascending = oldest first
+                    .limit(overflow)
+                    .select('_id');          // only fetch IDs — no need for full docs
+
+                const oldestIds = oldest.map(doc => doc._id);
+                await AnalysisHistory.deleteMany({ _id: { $in: oldestIds } });
+            }
         } catch (dbErr) {
             console.log("Failed to save analysis history:", dbErr);
         }

@@ -79,15 +79,14 @@ const HistoryView = ({ data }) => {
         </div>
       </div>
 
-      {/* Charts row: Skill Radar + [NEW] Language Pie + Complexity Bar */}
       <div style={{ display: 'flex', gap: '20px', marginBottom: '30px', flexWrap: 'wrap' }}>
         {/* Skill radar */}
-        <div style={{ flex: '1 1 280px', height: 280, background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '20px', borderRadius: '8px' }}>
-          <h4 style={{ textAlign: 'center', marginBottom: '20px', color: 'var(--text)' }}>Skill Radar</h4>
+        <div style={{ flex: '1 1 280px', height: 280, background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '25px', borderRadius: '8px' }}>
+          <h2 style={{ textAlign: 'center', marginBottom: '20px', color: 'var(--text)' }}>Skill Radar</h2>
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart cx="50%" cy="50%" outerRadius="60%" data={topicData}>
               <PolarGrid stroke="var(--card-border)" />
-              <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text)', fontSize: 11 }} />
+              <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text)', fontSize: 17 }} />
               <PolarRadiusAxis angle={30} domain={[0, 'auto']} tick={false} axisLine={false} />
               <Radar name="Analyzed" dataKey="A" stroke="#10b981" fill="#10b981" fillOpacity={0.6} />
               <Tooltip contentStyle={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--card-border)', color: 'var(--text)' }} />
@@ -99,7 +98,7 @@ const HistoryView = ({ data }) => {
         <LanguagePieChart data={filteredData} />
 
         {/* Time complexity bar */}
-        <div style={{ flex: '1 1 280px', height: 280, background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '20px', borderRadius: '8px' }}>
+        <div style={{ flex: '1 1 280px', height: 320, background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '20px', borderRadius: '8px' }}>
           <h4 style={{ textAlign: 'center', marginBottom: '20px', color: 'var(--text)' }}>Time Complexities Used</h4>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={complexityData} margin={{ bottom: 40 }}>

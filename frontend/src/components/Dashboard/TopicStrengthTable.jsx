@@ -1,11 +1,9 @@
 import React from 'react';
 import styles from './TopicStrengthTable.module.css';
-
+import { CheckCheck,CircleX } from 'lucide-react';
 
 const TopicStrengthTable = ({ data }) => {
-  // ── Step 1: Aggregate scores by topic ──
-  // WHY: The raw data has one entry per quiz attempt. We need to roll them
-  // up so we have one row per topic with the average score across all attempts.
+  // Aggregate scores by tthe average score across all attempts.
   const topicMap = {};
 
   data.forEach(item => {
@@ -18,7 +16,7 @@ const TopicStrengthTable = ({ data }) => {
     topicMap[topic].attempts       += 1;
   });
 
-  // ── Step 2: Convert the map to an array and compute avg % ──
+  // Convert the map to an array and compute avg 
   const rows = Object.entries(topicMap).map(([topic, stats]) => {
     const avgPct = Math.round((stats.totalScore / stats.totalQuestions) * 100);
     return { topic, avgPct, attempts: stats.attempts };
@@ -27,13 +25,11 @@ const TopicStrengthTable = ({ data }) => {
   // Sort: worst topics first — so the user's attention goes where it's needed
   rows.sort((a, b) => a.avgPct - b.avgPct);
 
-  // ── Step 3: Classify each topic into one of three statuses ──
-  // WHY: Numbers alone don't give instant meaning. A coloured badge makes the
-  // status obvious at a glance without reading a single number.
+  //  Classify each topic into one of three statuses ──
   const getStatus = (pct) => {
-    if (pct >= 80) return { label: 'Mastered ✅',        className: styles.mastered };
-    if (pct >= 50) return { label: 'Needs Practice ⚠️', className: styles.needsPractice };
-    return             { label: 'Struggling ❌',         className: styles.struggling };
+    if (pct >= 80) return { label: 'Mastered',        className: styles.mastered };
+    if (pct >= 50) return { label: 'Needs Practice', className: styles.needsPractice };
+    return             { label: 'Struggling',         className: styles.struggling };
   };
 
   if (rows.length === 0) return null;

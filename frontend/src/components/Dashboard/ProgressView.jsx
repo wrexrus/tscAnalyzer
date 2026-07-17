@@ -3,6 +3,8 @@ import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 import ContributionHeatmap from './ContributionHeatmap';
 import TopicStrengthTable from './TopicStrengthTable';
+import ImprovementTimeline from './ImprovementTimeline';
+import XpBadgePanel from './XpBadgePanel';
 import styles from '../../pages/Dashboard.module.css';
 
 const ProgressView = ({ data }) => {
@@ -14,6 +16,7 @@ const ProgressView = ({ data }) => {
     .map((d, i) => ({ name: `Q${data.length - i}`, score: Math.round((d.score / d.totalQuestions) * 100) }))
     .reverse();
 
+  // ── Radar: aggregate average % per topic ──
   const topicGrip = {};
   data.forEach(item => {
     const t = item.topic && item.topic !== 'Unknown' ? item.topic : 'General';
@@ -29,10 +32,15 @@ const ProgressView = ({ data }) => {
 
   return (
     <div>
+      {/* Activity heatmap */}
       <ContributionHeatmap data={data} title="Quiz Activity Streak" />
 
+      {/* [NEW] XP + Badge Panel — shown right after heatmap so it's the first
+           thing users see — it's motivational and drives engagement */}
+      <XpBadgePanel data={data} />
+
+      {/* Score trend + concept radar side by side */}
       <div style={{ display: 'flex', gap: '20px', marginBottom: '30px', flexWrap: 'wrap' }}>
-        {/* Bar chart: score per session */}
         <div style={{ flex: '1 1 300px', height: 250, background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '20px', borderRadius: '8px' }}>
           <h4 style={{ textAlign: 'center', marginBottom: '20px', color: 'var(--text)' }}>Recent Quiz Scores (%)</h4>
           <ResponsiveContainer width="100%" height="100%">
@@ -45,7 +53,6 @@ const ProgressView = ({ data }) => {
           </ResponsiveContainer>
         </div>
 
-        {/* Radar chart: concept grip */}
         <div style={{ flex: '1 1 300px', height: 250, background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '20px', borderRadius: '8px' }}>
           <h4 style={{ textAlign: 'center', marginBottom: '20px', color: 'var(--text)' }}>Concept Grip (Radar)</h4>
           <ResponsiveContainer width="100%" height="100%">
@@ -60,7 +67,10 @@ const ProgressView = ({ data }) => {
         </div>
       </div>
 
-      {/* [NEW] Topic Strength Table — gives precise per-topic scores & status */}
+      {/* [NEW] Improvement Timeline — per-topic score trend over time */}
+      <ImprovementTimeline data={data} />
+
+      {/* Topic Strength Table — precise per-topic scores & status */}
       <TopicStrengthTable data={data} />
 
       {/* Individual quiz history cards */}

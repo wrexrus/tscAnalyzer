@@ -41,10 +41,13 @@ export const AnalyzeStrategy = {
             parsedMistakes = mistakesMatch[1].split('|').map(m => m.trim()).filter(m => m);
         }
 
+        const whyMatch = responseText.match(/Why:\s*([\s\S]*)/i);
+        const educationalExplanation = whyMatch ? whyMatch[1].trim() : "";
+
         return {
             user: userId,
             actionType: 'analyze',
-            explanation: responseText,
+            explanation: educationalExplanation, // only the 'Why' section now
             language: langMatch ? langMatch[1].trim() : "Unknown",
             timeComplexity: timeMatch ? timeMatch[1].trim() : "Unknown",
             spaceComplexity: spaceMatch ? spaceMatch[1].trim() : "Unknown",
