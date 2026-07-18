@@ -124,7 +124,7 @@ const Learn = () => {
               </tr>
               <tr>
                 <td style={{ textAlign: 'left', fontWeight: 600 }}>Hash Table</td>
-                <td><span className="cs-cell cs-excel">N/A</span></td>
+                <td><span className="cs-cell cs-excel">O(1)</span></td>
                 <td><span className="cs-cell cs-excel">O(1)</span></td>
                 <td><span className="cs-cell cs-excel">O(1)</span></td>
                 <td><span className="cs-cell cs-excel">O(1)</span></td>

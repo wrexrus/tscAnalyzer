@@ -5,18 +5,16 @@ import ContributionHeatmap from './ContributionHeatmap';
 import TopicStrengthTable from './TopicStrengthTable';
 import ImprovementTimeline from './ImprovementTimeline';
 import XpBadgePanel from './XpBadgePanel';
+import LearningRoadmap from './LearningRoadmap';
 import styles from '../../pages/Dashboard.module.css';
 
 const ProgressView = ({ data }) => {
   if (data.length === 0) return <p className={styles.empty}>No quiz history found. Take a quiz to see your progress here!</p>;
 
-  // ── Score trend: most recent quiz = Q(last), etc. ──
-  // WHY reverse: we want chronological order left-to-right on the bar chart
   const scoreData = data
     .map((d, i) => ({ name: `Q${data.length - i}`, score: Math.round((d.score / d.totalQuestions) * 100) }))
     .reverse();
 
-  // ── Radar: aggregate average % per topic ──
   const topicGrip = {};
   data.forEach(item => {
     const t = item.topic && item.topic !== 'Unknown' ? item.topic : 'General';
@@ -32,14 +30,13 @@ const ProgressView = ({ data }) => {
 
   return (
     <div>
-      {/* Activity heatmap */}
       <ContributionHeatmap data={data} title="Quiz Activity Streak" />
-
-      {/* [NEW] XP + Badge Panel — shown right after heatmap so it's the first
-           thing users see — it's motivational and drives engagement */}
+  
       <XpBadgePanel data={data} />
 
-      {/* Score trend + concept radar side by side */}
+     
+      <LearningRoadmap data={data} />
+
       <div style={{ display: 'flex', gap: '20px', marginBottom: '30px', flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 300px', height: 250, background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '20px', borderRadius: '8px' }}>
           <h4 style={{ textAlign: 'center', marginBottom: '20px', color: 'var(--text)' }}>Recent Quiz Scores (%)</h4>
