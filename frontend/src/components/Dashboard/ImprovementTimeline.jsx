@@ -1,12 +1,4 @@
-/* Working:
-  Group all quiz attempts by topic.
-  Let the user pick a topic from a dropdown.
-  Sort that topic's attempts by date (chronological).
-  Plot score % on the Y-axis and attempt number on the X-axis.
-  Show a "trend line" (average) so the user can see direction at a glance.
- */
-
-import { ChartNoAxesCombined } from 'lucide-react';
+import { ChartNoAxesCombined, TrendingUp, TrendingDown } from 'lucide-react';
 
 import React, { useState, useMemo } from 'react';
 import {
@@ -90,7 +82,7 @@ const ImprovementTimeline = ({ data }) => {
       </div>
 
       <div className={`${styles.trendBadge} ${isImproving ? styles.trendUp : styles.trendDown}`}>
-        {isImproving ? '▲ Improving' : '▼ Declining'} — last vs first session
+        {isImproving ? <><TrendingUp size={16} /> Improving</> : <><TrendingDown size={16} /> Declining</>} — last vs first session
       </div>
 
       <div style={{ height: 260, marginTop: '16px' }}>

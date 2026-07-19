@@ -18,10 +18,13 @@
 }
 
 .title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-family: 'Playfair Display', serif;
   color: var(--text);
-  font-size: 1.3rem;
-  margin: 0 0 4px;
+  font-size: 1.4rem;
+  margin: 0 0 6px;
 }
 
 .subtitle {
@@ -49,11 +52,14 @@
 }
 
 .trendBadge {
-  display: inline-block;
-  padding: 4px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 600;
+  margin-top: 10px;
 }
 
 .trendUp {

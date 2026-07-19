@@ -38,6 +38,10 @@
 }
 
 .generateBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   background: var(--primary);
   color: var(--button-text);
   border: none;
@@ -63,6 +67,10 @@
 
 /* Close / reopen toggle — subtle text button style */
 .toggleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   background: none;
   border: 1px solid var(--card-border);
   color: var(--text);

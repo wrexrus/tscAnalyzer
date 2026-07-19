@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
+import { PartyPopper } from 'lucide-react';
 import ContributionHeatmap from './ContributionHeatmap';
 import HistoryCard from './HistoryCard';
 import LanguagePieChart from './LanguagePieChart';
@@ -74,7 +75,9 @@ const HistoryView = ({ data }) => {
               {topMistakes.map((m, idx) => <li key={idx} style={{ marginBottom: '6px' }}>{m}</li>)}
             </ul>
           ) : (
-            <p style={{ color: 'var(--text)', opacity: 0.7 }}>No repeated mistakes — keep coding cleanly! 🎉</p>
+            <p style={{ color: 'var(--text)', opacity: 0.7, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <PartyPopper size={20} color="#10b981" /> No repeated mistakes — keep coding cleanly!
+            </p>
           )}
         </div>
       </div>
@@ -111,7 +114,7 @@ const HistoryView = ({ data }) => {
         </div>
       </div>
 
-      {/* [NEW] Expandable history cards — full analysis on demand */}
+      {/*  expandable history cards  */}
       <div className={styles.list}>
         {filteredData.map((item, idx) => (
           <HistoryCard key={idx} item={item} />

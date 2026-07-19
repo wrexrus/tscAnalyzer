@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_BASE_URL } from '../../api';
 import styles from './LearningRoadmap.module.css';
-import { Laptop,BookOpenText,Dumbbell,Lightbulb,Zap,NotebookPen,Goal,TriangleAlert,BadgeInfo,TrendingDown,ChartColumn,ClipboardList,RefreshCw } from 'lucide-react';
+import { Laptop,BookOpenText,Dumbbell,Lightbulb,Zap,NotebookPen,Goal,TriangleAlert,BadgeInfo,TrendingDown,ChartColumn,ClipboardList,RefreshCw,Sparkles,X,ChevronDown,ChevronUp } from 'lucide-react';
 
 const FOCUS_CONFIG = {
   theory:   { label: 'Theory Day',   icon:  <BookOpenText />, className: 'focusTheory'   },
@@ -190,7 +190,13 @@ const LearningRoadmap = ({ data }) => {
 
           <div className={styles.headerActions}>
             <button className={styles.generateBtn} onClick={generate} disabled={loading}>
-              {loading ? 'Generating...' : roadmap ? ` Regenerate` : `Generate My Roadmap`}
+              {loading ? (
+                <>Generating...</>
+              ) : roadmap ? (
+                <><RefreshCw size={18} /> Regenerate</>
+              ) : (
+                <><Sparkles size={18} /> Generate My Roadmap</>
+              )}
             </button>
 
             {roadmap && !loading && (
@@ -199,7 +205,7 @@ const LearningRoadmap = ({ data }) => {
                 onClick={() => setIsVisible(v => !v)}
                 title={isVisible ? 'Minimise roadmap' : 'Show roadmap'}
               >
-                {isVisible ? '✕ Close' : '▼ Show Roadmap'}
+                {isVisible ? <><X size={18} /> Close</> : <><ChevronDown size={18} /> Show Roadmap</>}
               </button>
             )}
           </div>
