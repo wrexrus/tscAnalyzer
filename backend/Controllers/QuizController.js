@@ -2,22 +2,24 @@ import QuizResult from "../Models/QuizResult.js";
 import AnalysisHistory from "../Models/AnalysisHistory.js";
 import { getGeminiModel, generateWithRetry } from "../Services/GeminiService.js";
 
-// converts raw quiz DB records into a compact per-topic summary.
 const extractQuizInsights = (results) => {
   const topicMap = {};
 
   results.forEach(r => {
     const topic = r.topic || "General";
-    if (!topicMap[topic]) topicMap[topic] = { totalScore: 0, totalQs: 0, attempts: 0, category: r.category };
-    topicMap[topic].totalScore += r.score;
-    topicMap[topic].totalQs   += r.totalQuestions;
-    topicMap[topic].attempts  += 1;
+    const mode = r.mode || "Classic DSA";
+    const key = `${mode} - ${topic}`; // Group by mode and topic
+    
+    if (!topicMap[key]) topicMap[key] = { topic, mode, totalScore: 0, totalQs: 0, attempts: 0, category: r.category };
+    topicMap[key].totalScore += r.score;
+    topicMap[key].totalQs   += r.totalQuestions;
+    topicMap[key].attempts  += 1;
   });
 
-  // Convert to array sorted by average score ascending (worst first)
-  return Object.entries(topicMap)
-    .map(([topic, stats]) => ({
-      topic,
+  return Object.values(topicMap)
+    .map((stats) => ({
+      mode: stats.mode,
+      topic: stats.topic,
       category: stats.category,
       avgPct: Math.round((stats.totalScore / stats.totalQs) * 100),
       attempts: stats.attempts
@@ -25,7 +27,7 @@ const extractQuizInsights = (results) => {
     .sort((a, b) => a.avgPct - b.avgPct);
 };
 
-// Converts raw analysis/optimize DB records into compact mistake + topic signals.
+// converts raw analysis/optimize DB records into compact mistake + topic signals.
 const extractCodeInsights = (records) => {
   const mistakeFreq = {};
   const topicCount  = {};
@@ -85,12 +87,12 @@ export const learningRoadmap = async (req, res) => {
       quizSessions:    quizResults.length,
       codeSessions:    codeRecords.length,
       topMistakes:     codeInsights.topMistakes,
-      weakestTopics:   quizInsights.slice(0, 3).map(t => `${t.topic} (${t.avgPct}%)`),
+      weakestTopics:   quizInsights.slice(0, 3).map(t => `${t.mode} - ${t.topic} (${t.avgPct}%)`),
     };
 
     //build the compact insight string sent to Gemini 
     const quizSummary = quizInsights.length > 0
-      ? quizInsights.map(t => `${t.topic}: ${t.avgPct}% avg (${t.attempts} attempts)`).join(", ")
+      ? quizInsights.map(t => `${t.mode} - ${t.topic}: ${t.avgPct}% avg (${t.attempts} attempts)`).join(", ")
       : "No quiz data yet.";
 
     const mistakeSummary = codeInsights.topMistakes.length > 0
@@ -103,28 +105,28 @@ export const learningRoadmap = async (req, res) => {
 
     const prompt = `You are an expert computer science tutor building a personalised 7-day DSA and coding learning roadmap.
 
-Student data:
-QUIZ PERFORMANCE (worst first): ${quizSummary}
-RECURRING CODE MISTAKES: ${mistakeSummary}
-TOPICS CODED IN: ${topicSummary}
+          Student data:
+          QUIZ PERFORMANCE (worst first): ${quizSummary}
+          RECURRING CODE MISTAKES: ${mistakeSummary}
+          TOPICS CODED IN: ${topicSummary}
 
-Generate a 7-day roadmap that:
-- Targets the student's WEAKEST quiz topics and most REPEATED code mistakes
-- Alternates between theory days, coding practice days, and quiz practice days
-- Is specific and actionable — not generic advice
-- Focuses on Data Structures, Algorithms, and code efficiency
+          Generate a 7-day roadmap that:
+          - Targets the student's WEAKEST quiz topics and most REPEATED code mistakes
+          - Alternates between theory days, coding practice days, and quiz practice days
+          - Is specific and actionable — not generic advice
+          - Focuses on Data Structures, Algorithms, and code efficiency
 
-Return ONLY a valid JSON array of exactly 7 objects. No markdown, no explanation outside the JSON.
-Each object must have EXACTLY these keys:
-{
-  "day": <number 1-7>,
-  "topic": "<specific topic name>",
-  "focus": "<one of: theory | code | practice>",
-  "why": "<1-2 sentences: why this topic was chosen for this student specifically>",
-  "task": "<specific actionable task for the day>",
-  "practiceHint": "<where/how to practice: quiz suggestion, LeetCode problem number, or coding exercise>",
-  "complexityGoal": "<the complexity insight to understand or achieve today>"
-}`;
+          Return ONLY a valid JSON array of exactly 7 objects. No markdown, no explanation outside the JSON.
+          Each object must have EXACTLY these keys:
+          {
+            "day": <number 1-7>,
+            "topic": "<specific topic name>",
+            "focus": "<one of: theory | code | practice>",
+            "why": "<1-2 sentences: why this topic was chosen for this student specifically>",
+            "task": "<specific actionable task for the day>",
+            "practiceHint": "<where/how to practice: quiz suggestion, LeetCode problem number, or coding exercise>",
+            "complexityGoal": "<the complexity insight to understand or achieve today>"
+          }`;
 
     const model  = getGeminiModel();
     const result = await generateWithRetry(model, prompt);
@@ -133,12 +135,17 @@ Each object must have EXACTLY these keys:
     // parse Gemini's JSON response
     // two-step coz, Gemini sometimes wraps JSON in ```json fences despite instructions.
     let roadmap;
-    const jsonMatch = text.match(/\[\s*\{[\s\S]*\}\s*\]/);
-    if (jsonMatch) {
-      roadmap = JSON.parse(jsonMatch[0]);
-    } else {
-      const cleaned = text.replace(/```json/gi, "").replace(/```/g, "").trim();
-      roadmap = JSON.parse(cleaned);
+    try {
+      const jsonMatch = text.match(/\[\s*\{[\s\S]*\}\s*\]/);
+      if (jsonMatch) {
+        roadmap = JSON.parse(jsonMatch[0]);
+      } else {
+        const cleaned = text.replace(/```json/gi, "").replace(/```/g, "").trim();
+        roadmap = JSON.parse(cleaned);
+      }
+    } catch (parseError) {
+      console.error("Gemini Output Parsing Failed. Output was:", text);
+      throw new Error("Failed to parse Gemini roadmap output as JSON");
     }
 
     // Validate: must be an array of 7 objects with required keys
@@ -158,20 +165,38 @@ Each object must have EXACTLY these keys:
 };
 
 export const generateQuestions = async (req, res) => {
-  const { topic, difficulty } = req.body;
+  const { mode, topic, difficulty } = req.body;
 
   if (!topic || !difficulty) {
     return res.status(400).json({ error: "Topic and difficulty are required." });
   }
 
+  const currentMode = mode || "Classic DSA";
+
   try {
     const model = getGeminiModel();
-    const prompt = `You are a computer science quiz generator.
+    
+    let modePrompt = "";
+    if (currentMode === "Code Debugging & Complexity") {
+      modePrompt = "Format: Provide a short code snippet in the question text. Ask the user to identify the bug, determine the Time/Space complexity, or identify edge cases.";
+    } else if (currentMode === "System Design") {
+      modePrompt = "Format: Provide a real-world scenario (e.g. designing a news feed, scaling a database). Test the user's architectural decision-making, caching, load balancing, or trade-offs.";
+    } else {
+      modePrompt = "Format: Standard conceptual or theoretical multiple-choice questions about the properties of the data structure or algorithm.";
+    }
+
+    const randomSeed = Math.floor(Math.random() * 1000000);
+    const prompt = `You are an expert technical interviewer and computer science quiz generator.
 Generate exactly 10 ${difficulty} level multiple-choice questions on the topic: ${topic}.
+Mode: ${currentMode}
+${modePrompt}
+
+CRITICAL INSTRUCTION: Ensure these questions are highly unique, non-repetitive, and explore niche edge-cases of the topic (Randomization Seed: ${randomSeed}). Do not generate the standard generic questions.
+
 Return ONLY a raw JSON array of objects. Do not include any markdown formatting like \`\`\`json.
 Schema for each object:
 {
-  "text": "Question text",
+  "text": "Question text (can include \\n for code snippets)",
   "options": ["A", "B", "C", "D"],
   "correctIndex": 0,
   "explanation": "Brief explanation"
@@ -201,9 +226,10 @@ Schema for each object:
 
 export const saveResult = async (req, res) => {
   try {
-    const { category, topic, difficulty, score, totalQuestions } = req.body;
+    const { mode, category, topic, difficulty, score, totalQuestions } = req.body;
     const newResult = new QuizResult({
       user: req.user._id,
+      mode: mode || "Classic DSA",
       category,
       topic,
       difficulty,

@@ -3,6 +3,7 @@ import { GrPowerReset } from "react-icons/gr";
 import styles from './Chatbot.module.css';
 import { API_BASE_URL } from "../../api";
 import { X } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 export default function Chatbot({ open, onClose }) {
   const [messages, setMessages] = useState([
@@ -110,7 +111,13 @@ export default function Chatbot({ open, onClose }) {
         <div ref={listRef} className={styles.list}>
           {messages.map((m,i)=>(
             <div key={i} className={`${styles.bubble} ${m.role==='user' ? styles.user : styles.assistant}`}>
-              {m.content}
+              {m.role === 'user' ? (
+                m.content
+              ) : (
+                <div className={styles.markdownContent}>
+                  <ReactMarkdown>{m.content}</ReactMarkdown>
+                </div>
+              )}
             </div>
           ))}
           {sending && (

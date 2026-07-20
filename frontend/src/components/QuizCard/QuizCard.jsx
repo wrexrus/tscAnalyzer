@@ -3,28 +3,35 @@ import styles from "./QuizCard.module.css";
 import axios from "axios";
 import { API_BASE_URL } from "../../api";
 import { handleError } from "../../pages/utils";
+import { Lightbulb,CircleCheck,CircleX } from 'lucide-react';
 
-const CATEGORIES = {
-  "Linear Data Structures": [
-    "Arrays", "Strings", "Singly Linked lists", "Doubly Linked lists", "Stack and Queues"
-  ],
-  "Non-Linear Data Structures": [
-    "Trees", "Graphs", "Binary Trees"
-  ],
-  "Algorithms": [
-    "Quick Sort", "Merge Sort", "Binary Search", "Recursion"
-  ]
+const MODES = {
+  "Classic DSA": {
+    "Linear Data Structures": ["Arrays & Strings", "Linked Lists", "Stacks & Queues"],
+    "Non-Linear Data Structures": ["Trees & Graphs", "Heaps & Tries", "Hash Tables"],
+    "Algorithms & Paradigms": ["Sorting & Searching", "Recursion", "Dynamic Programming", "Greedy Algorithms", "Divide & Conquer"]
+  },
+  "Code Debugging & Complexity": {
+    "Core CS": ["Time Complexity (Big-O)", "Space Complexity", "Bit Manipulation"],
+    "Debugging": ["Spot the Bug", "Edge Case Identification", "Memory Leaks"]
+  },
+  "System Design": {
+    "Architecture": ["Load Balancing", "Caching Strategies", "Microservices", "Rate Limiting"],
+    "Databases": ["SQL vs NoSQL", "Database Sharding", "CAP Theorem"]
+  }
 };
 
 const QuizCard = () => {
-  // Mode state: 'categories' | 'topics' | 'difficulty' | 'quiz' | 'loading'
-  const [viewMode, setViewMode] = useState("categories");
+  // Mode state: 'modes' | 'categories' | 'topics' | 'difficulty' | 'quiz' | 'loading'
+  const [viewMode, setViewMode] = useState("modes");
+  const [selectedMode, setSelectedMode] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState(null);
   const [currentQuestions, setCurrentQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
+  const [userAnswers, setUserAnswers] = useState([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [score, setScore] = useState(0);
   const [showScoreHelper, setShowScoreHelper] = useState(false);
@@ -39,6 +46,11 @@ const QuizCard = () => {
       window.removeEventListener('authChanged', onAuthChange);
     };
   }, []);
+
+  const handleModeSelect = (mode) => {
+    setSelectedMode(mode);
+    setViewMode("categories");
+  };
 
   const handleCategorySelect = (category) => {
     setSelectedCategory(category);
@@ -56,6 +68,7 @@ const QuizCard = () => {
 
     try {
       const response = await axios.post(`${API_BASE_URL}/quiz/generate-questions`, {
+        mode: selectedMode,
         topic: selectedTopic,
         difficulty,
       });
@@ -76,6 +89,7 @@ const QuizCard = () => {
   const resetQuizState = () => {
     setCurrentIndex(0);
     setSelectedOption(null);
+    setUserAnswers([]);
     setIsSubmitted(false);
     setScore(0);
     setShowScoreHelper(false);
@@ -92,6 +106,8 @@ const QuizCard = () => {
   };
 
   const handleNext = async () => {
+    setUserAnswers((prev) => [...prev, selectedOption]);
+
     if (currentIndex + 1 < currentQuestions.length) {
       setCurrentIndex((prev) => prev + 1);
       setSelectedOption(null);
@@ -101,6 +117,7 @@ const QuizCard = () => {
       if (isLoggedIn) {
         try {
           await axios.post(`${API_BASE_URL}/quiz/save-result`, {
+            mode: selectedMode,
             category: selectedCategory,
             topic: selectedTopic,
             difficulty: selectedDifficulty,
@@ -117,10 +134,17 @@ const QuizCard = () => {
   };
 
   const handleRestart = () => {
-    setViewMode("categories");
-    setSelectedTopic(null);
+    setViewMode("modes");
+    setSelectedMode(null);
     setSelectedCategory(null);
+    setSelectedTopic(null);
     resetQuizState();
+  };
+
+  const handleRegenerate = () => {
+    if (selectedDifficulty) {
+      handleDifficultySelect(selectedDifficulty);
+    }
   };
 
   // --- RENDER HELPERS ---
@@ -134,8 +158,8 @@ const QuizCard = () => {
     );
   }
 
-  // 1. CATEGORY SELECTION View
-  if (viewMode === "categories") {
+  // 1. MODE SELECTION View
+  if (viewMode === "modes") {
     return (
       <div className={styles["quiz-container"]}>
         {!isLoggedIn && (
@@ -144,16 +168,17 @@ const QuizCard = () => {
           </div>
         )}
         <h2 className={styles["quiz-question"]} style={{ marginBottom: "20px" }}>
-          Select a Category
+          Select Interview Mode
         </h2>
-        <div className={styles["difficulty-container"]} style={{ maxWidth: "600px", marginBottom: "30px" }}>
-          {Object.keys(CATEGORIES).map(category => (
+        <div className={styles["difficulty-container"]} style={{ maxWidth: "600px", marginBottom: "30px", display: "flex", flexDirection: "column", gap: "10px" }}>
+          {Object.keys(MODES).map(mode => (
             <button
-              key={category}
+              key={mode}
               className={`${styles["quiz-option"]} ${styles["difficulty-btn"]}`}
-              onClick={() => handleCategorySelect(category)}
+              onClick={() => handleModeSelect(mode)}
+              style={{ width: "100%", padding: "15px" }}
             >
-              {category}
+              {mode}
             </button>
           ))}
         </div>
@@ -172,9 +197,36 @@ const QuizCard = () => {
     );
   }
 
-  // 2. TOPIC SELECTION View
+  // 2. CATEGORY SELECTION View
+  if (viewMode === "categories") {
+    const modeCategories = MODES[selectedMode] || {};
+    return (
+      <div className={styles["quiz-container"]}>
+        <h2 className={styles["quiz-question"]} style={{ marginBottom: "20px" }}>
+          Select a Category
+        </h2>
+        <div className={styles["difficulty-container"]} style={{ maxWidth: "600px", marginBottom: "30px" }}>
+          {Object.keys(modeCategories).map(category => (
+            <button
+              key={category}
+              className={`${styles["quiz-option"]} ${styles["difficulty-btn"]}`}
+              onClick={() => handleCategorySelect(category)}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+        
+        <button onClick={() => setViewMode("modes")} className={styles["quiz-restart-btn"]} style={{ marginTop: "20px" }}>
+          Back to Modes
+        </button>
+      </div>
+    );
+  }
+
+  // 3. TOPIC SELECTION View
   if (viewMode === "topics") {
-    const categoryTopics = CATEGORIES[selectedCategory] || [];
+    const categoryTopics = MODES[selectedMode][selectedCategory] || [];
     return (
       <div className={styles["quiz-container"]}>
         <h2 className={styles["quiz-question"]} style={{ marginBottom: "20px" }}>
@@ -198,7 +250,7 @@ const QuizCard = () => {
     );
   }
 
-  // 3. DIFFICULTY SELECTION View
+  // 4. DIFFICULTY SELECTION View
   if (viewMode === "difficulty") {
     return (
       <div className={styles["quiz-card"]}>
@@ -226,7 +278,7 @@ const QuizCard = () => {
     );
   }
 
-  // 4. QUIZ TAKING View
+  // 5. QUIZ TAKING View
   const currentQuestion = currentQuestions[currentIndex];
 
   if (!currentQuestion) {
@@ -243,7 +295,7 @@ const QuizCard = () => {
       {!showScoreHelper ? (
         <>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%', maxWidth: '600px', marginBottom: '40px' }}>
-            <h3 className={styles["quiz-question"]} style={{ margin: 0, textAlign: 'left', flex: 1 }}>
+            <h3 className={styles["quiz-question"]} style={{ margin: 0, textAlign: 'left', flex: 1, whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>
               {currentIndex + 1}. {currentQuestion.text}
             </h3>
             <button onClick={handleRestart} className={styles["quiz-quit-btn"]}>
@@ -285,8 +337,8 @@ const QuizCard = () => {
                 }}
               >
                 {selectedOption === currentQuestion.correctIndex
-                  ? "✅ Correct!"
-                  : "❌ Incorrect!"}
+                  ? "Correct!"
+                  : "Incorrect!"}
               </strong>
               <p className={styles["quiz-explanation"]}>
                 {currentQuestion.explanation}
@@ -312,9 +364,42 @@ const QuizCard = () => {
               ? "Perfect score! You're a pro! "
               : "Good practice! Keep it up. "}
           </p>
-          <button onClick={handleRestart} className={styles["quiz-restart-btn"]}>
-            Choose Another Topic
-          </button>
+
+          <div className={styles["review-list"]}>
+            {currentQuestions.map((q, idx) => {
+              const userAnswer = userAnswers[idx];
+              const isCorrect = userAnswer === q.correctIndex;
+
+              return (
+                <div key={idx} className={styles["review-card"]}>
+                  <h4 className={styles["review-question"]}>Q{idx + 1}: {q.text}</h4>
+                  
+                  <p style={{ color: isCorrect ? '#4caf50' : '#f44336', fontWeight: 600, margin: '8px 0' }}>
+                    Your Answer: {q.options[userAnswer]} {isCorrect ? <CircleCheck /> : <CircleX />}
+                  </p>
+                  
+                  {!isCorrect && (
+                    <p style={{ color: '#4caf50', fontWeight: 600, margin: '8px 0' }}>
+                      Correct Answer: {q.options[q.correctIndex]}
+                    </p>
+                  )}
+
+                  <div className={styles["explanation-box"]}>
+                    <p style={{ margin: 0 }}><Lightbulb /> {q.explanation}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "20px" }}>
+            <button onClick={handleRegenerate} className={styles["quiz-restart-btn"]}>
+              Re-generate This Quiz
+            </button>
+            <button onClick={handleRestart} className={styles["quiz-restart-btn"]}>
+              Choose Another Topic
+            </button>
+          </div>
         </div>
       )}
     </div>

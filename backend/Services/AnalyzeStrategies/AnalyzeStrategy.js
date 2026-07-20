@@ -47,7 +47,7 @@ export const AnalyzeStrategy = {
         return {
             user: userId,
             actionType: 'analyze',
-            explanation: educationalExplanation, // only the 'Why' section now
+            explanation: educationalExplanation, 
             language: langMatch ? langMatch[1].trim() : "Unknown",
             timeComplexity: timeMatch ? timeMatch[1].trim() : "Unknown",
             spaceComplexity: spaceMatch ? spaceMatch[1].trim() : "Unknown",

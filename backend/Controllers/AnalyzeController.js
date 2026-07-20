@@ -48,8 +48,8 @@ const analyze = asyncHandler(async (req, res, next) => {
             // Save the new analysis record
             await AnalysisHistory.create(dbPayload);
 
-            // Rolling Cap: keep max 50 records per user 
-            // WHY: Without a cap, a power user could store thousands of records,
+            // rolling Cap: keep max 50 records per user 
+            // without a cap, a power user could store thousands of records,
             // bloating the DB and slowing every query
             
             const totalRecords = await AnalysisHistory.countDocuments({ user: userId });

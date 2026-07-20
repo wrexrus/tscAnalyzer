@@ -201,3 +201,37 @@
   background: var(--text);
   color: var(--bg);
 }
+
+/* --- Review Screen Styles --- */
+.review-list {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-top: 20px;
+  padding-right: 10px;
+  text-align: left;
+}
+
+.review-card {
+  background: var(--card-bg, #1a1a1a);
+  border: 1px solid var(--border-color, #333);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.review-question {
+  margin: 0 0 12px 0;
+  color: var(--text, #fff);
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.explanation-box {
+  background: rgba(255, 255, 255, 0.05);
+  border-left: 3px solid #f39c12;
+  padding: 12px;
+  margin-top: 12px;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  color: var(--text, #ddd);
+}

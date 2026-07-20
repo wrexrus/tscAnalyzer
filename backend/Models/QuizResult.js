@@ -6,7 +6,14 @@ const QuizResultSchema = new mongoose.Schema({
     ref: 'users',
     required: true
   },
-  category: { type: String, required: true },
+  mode: {
+    type: String,
+    default: 'Classic DSA'
+  },
+  category: {
+    type: String,
+    required: true
+  },
   topic: { type: String, required: true },
   difficulty: { type: String, required: true },
   score: { type: Number, required: true },
