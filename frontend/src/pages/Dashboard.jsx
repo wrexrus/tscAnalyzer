@@ -116,7 +116,7 @@ const Dashboard = ({ theme, toggleTheme, onBotClick }) => {
 
           {/*  AI Tutor Sidebar  */}
           <div className={styles.aiPanel}>
-            <h3 className={styles.aiTitle}><Bot size={40} /> AI Tutor Review</h3>
+            <h3 className={styles.aiTitle}><Bot size={40} style={{ flexShrink: 0 }} /> AI Tutor Review</h3>
             <p className={styles.aiDesc}>
               Get personalized feedback based on your recent {activeTab === 'progress' ? 'quiz performance' : 'coding history'}.
             </p>

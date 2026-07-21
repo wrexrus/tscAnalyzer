@@ -111,8 +111,11 @@
 .dataPanelTitle {
   color: var(--text);
   font-weight: 600;
-  margin: 0 0 8px;
+  margin: 0 0 12px;
   font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .dataList {
@@ -128,6 +131,9 @@
   color: var(--text);
   opacity: 0.8;
   font-size: 0.88rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
 }
 
 /* ── 7-day card grid ── */
@@ -176,10 +182,12 @@
 }
 
 .focusChip {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.78rem;
   font-weight: 600;
-  padding: 3px 10px;
+  padding: 4px 10px;
   border-radius: 20px;
   background: rgba(128,128,128,0.1);
   color: var(--text);
@@ -232,6 +240,9 @@
   opacity: 0.7;
   margin: 0;
   line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
 }
 
 /* Subtle clickable cue at the bottom of each card */
@@ -350,6 +361,9 @@
   letter-spacing: 0.07em;
   color: var(--text);
   opacity: 0.5;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .modalSectionText {

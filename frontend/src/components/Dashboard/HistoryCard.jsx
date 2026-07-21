@@ -22,15 +22,15 @@ const HistoryCard = ({ item }) => {
       </div>
 
       <div className={styles.badges}>
-        <span className={styles.badge}><Clock4 /> {item.timeComplexity}</span>
-        <span className={styles.badge}><Save /> {item.spaceComplexity}</span>
+        <span className={styles.badge}><Clock4 size={20}/> {item.timeComplexity}</span>
+        <span className={styles.badge}><Save size={20}/> {item.spaceComplexity}</span>
         {item.difficulty && item.difficulty !== 'Unknown' && (
           <span className={styles.badge} style={{ background: difficultyColor, color: '#fff' }}>
-            <Star /> {item.difficulty}
+            <Star size={20}/> {item.difficulty}
           </span>
         )}
         {item.developerLevel && item.developerLevel !== 'Unknown' && (
-          <span className={styles.badge}><Brain /> {item.developerLevel}</span>
+          <span className={styles.badge}><Brain size={20}/> {item.developerLevel}</span>
         )}
       </div>
 

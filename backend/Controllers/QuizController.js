@@ -63,10 +63,16 @@ const extractCodeInsights = (records) => {
 export const learningRoadmap = async (req, res) => {
   try {
     const userId = req.user._id;
+    const requestedMode = req.query.mode;
+
+    const quizQuery = { user: userId };
+    if (requestedMode && requestedMode !== 'Overall') {
+      quizQuery.mode = requestedMode;
+    }
 
     // Promise.all: Both DB queries are independent. Running them in parallel
     const [quizResults, codeRecords] = await Promise.all([
-      QuizResult.find({ user: userId }).sort({ createdAt: -1 }).limit(30),
+      QuizResult.find(quizQuery).sort({ createdAt: -1 }).limit(30),
       AnalysisHistory.find({ user: userId, actionType: { $in: ['analyze', 'optimize'] } })
         .sort({ createdAt: -1 })
         .limit(20)
@@ -144,7 +150,7 @@ export const learningRoadmap = async (req, res) => {
         roadmap = JSON.parse(cleaned);
       }
     } catch (parseError) {
-      console.error("Gemini Output Parsing Failed. Output was:", text);
+      // console.error("Gemini Output Parsing Failed. Output was:", text);
       throw new Error("Failed to parse Gemini roadmap output as JSON");
     }
 
@@ -261,17 +267,17 @@ export const aiReview = async (req, res) => {
       return res.status(200).json({ review: "You haven't taken any quizzes yet! Complete a few quizzes to get an AI review of your progress." });
     }
 
-    const dataString = results.map(r => `Topic: ${r.topic} (${r.category}, ${r.difficulty}) - Score: ${r.score}/${r.totalQuestions}`).join("\n");
+    const dataString = results.map(r => `Mode: ${r.mode || 'Classic DSA'} | Topic: ${r.topic} (${r.category}, ${r.difficulty}) - Score: ${r.score}/${r.totalQuestions}`).join("\n");
 
     const model = getGeminiModel();
     const prompt = `You are an expert computer science tutor. Analyze the following recent quiz results for a student. 
     Based on their weaknesses, provide a highly structured, actionable learning plan formatted in Markdown.
     
     Include exactly these sections:
-    ### 🎯 Focus Area For Today
+    ###  Focus Area For Today
     (Identify their weakest topic or highest time complexity and explain exactly WHY they should focus on it).
     
-    ### 💡 Quick Tip
+    ### Quick Tip
     (Provide a 2-sentence actionable rule of thumb related to their focus area, e.g., 'If you see nested loops, think Hash Map').
 
     Keep the entire response encouraging and under 150 words.

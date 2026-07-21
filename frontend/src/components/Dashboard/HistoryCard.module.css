@@ -58,12 +58,15 @@
 }
 
 .badge {
+  display: flex;
+  gap: 5px;
   background: rgba(128, 128, 128, 0.1);
   color: var(--text);
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 500;
+  align-items: center;
 }
 
 .mistakesSection {

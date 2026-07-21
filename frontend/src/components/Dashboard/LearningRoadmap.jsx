@@ -7,9 +7,9 @@ import styles from './LearningRoadmap.module.css';
 import { Laptop,BookOpenText,Dumbbell,Lightbulb,Zap,NotebookPen,Goal,TriangleAlert,BadgeInfo,TrendingDown,ChartColumn,ClipboardList,RefreshCw,Sparkles,X,ChevronDown,ChevronUp } from 'lucide-react';
 
 const FOCUS_CONFIG = {
-  theory:   { label: 'Theory Day',   icon:  <BookOpenText />, className: 'focusTheory'   },
-  code:     { label: 'Coding Day',   icon: <Laptop />, className: 'focusCode'     },
-  practice: { label: 'Practice Day', icon: <Dumbbell />, className: 'focusPractice' },
+  theory:   { label: 'Theory Day',   icon:  <BookOpenText size={16} />, className: 'focusTheory'  },
+  code:     { label: 'Coding Day',   icon: <Laptop size={16} />, className: 'focusCode'     },
+  practice: { label: 'Practice Day', icon: <Dumbbell size={16} />, className: 'focusPractice' },
 };
 
 const SkeletonCard = () => (
@@ -41,8 +41,8 @@ const DayCard = ({ item, onClick }) => {
         <span className={styles.taskLabel}>Today's Task</span>
         <p className={styles.taskText}>{item.task}</p>
       </div>
-      {item.practiceHint   && <p className={styles.hint}><Lightbulb /> {item.practiceHint}</p>}
-      {item.complexityGoal && <p className={styles.complexity}><Zap /> {item.complexityGoal}</p>}
+      {item.practiceHint   && <p className={styles.hint}><Lightbulb size={16} style={{ flexShrink: 0, marginTop: '2px' }} /> <span>{item.practiceHint}</span></p>}
+      {item.complexityGoal && <p className={styles.complexity}><Zap size={16} style={{ flexShrink: 0, marginTop: '2px' }} /> <span>{item.complexityGoal}</span></p>}
 
       <span className={styles.expandHint}>Click to expand ↗</span>
     </div>
@@ -85,20 +85,20 @@ const DayModal = ({ item, onClose }) => {
 
         {/* Why this topic */}
         <div className={styles.modalSection}>
-          <span className={styles.modalSectionLabel}><Goal /> Why This Topic</span>
+          <span className={styles.modalSectionLabel}><Goal size={16} style={{ flexShrink: 0 }}/> Why This Topic</span>
           <p className={styles.modalSectionText}>{item.why}</p>
         </div>
 
         {/* Task */}
         <div className={styles.modalSection}>
-          <span className={styles.modalSectionLabel}><NotebookPen /> Today's Task</span>
+          <span className={styles.modalSectionLabel}><NotebookPen size={16} style={{ flexShrink: 0 }}/> Today's Task</span>
           <p className={styles.modalSectionText}>{item.task}</p>
         </div>
 
         {/* Practice hint */}
         {item.practiceHint && (
           <div className={styles.modalSection}>
-            <span className={styles.modalSectionLabel}><Lightbulb /> Where to Practice</span>
+            <span className={styles.modalSectionLabel}><Lightbulb size={16} style={{ flexShrink: 0 }}/> Where to Practice</span>
             <p className={styles.modalSectionText}>{item.practiceHint}</p>
           </div>
         )}
@@ -106,7 +106,7 @@ const DayModal = ({ item, onClose }) => {
         {/* Complexity goal */}
         {item.complexityGoal && (
           <div className={styles.modalSection}>
-            <span className={styles.modalSectionLabel}><Zap /> Complexity Goal</span>
+            <span className={styles.modalSectionLabel}><Zap size={16} style={{ flexShrink: 0 }}/> Complexity Goal</span>
             <p className={styles.modalSectionText}>{item.complexityGoal}</p>
           </div>
         )}
@@ -120,15 +120,15 @@ const DayModal = ({ item, onClose }) => {
 // ── Transparency panel ──
 const DataUsedPanel = ({ dataUsed }) => (
   <div className={styles.dataPanel}>
-    <p className={styles.dataPanelTitle}><BadgeInfo /> This roadmap was built from your personal data:</p>
+    <p className={styles.dataPanelTitle}><BadgeInfo size={18} style={{ flexShrink: 0 }}/> This roadmap was built from your personal data:</p>
     <ul className={styles.dataList}>
-      <li><ChartColumn /> <strong>{dataUsed.quizSessions}</strong> quiz session{dataUsed.quizSessions !== 1 ? 's' : ''}</li>
-      <li><Laptop /> <strong>{dataUsed.codeSessions}</strong> code analysis/optimize session{dataUsed.codeSessions !== 1 ? 's' : ''}</li>
+      <li><ChartColumn size={16} style={{ flexShrink: 0, marginTop: '2px' }}/> <span><strong>{dataUsed.quizSessions}</strong> quiz session{dataUsed.quizSessions !== 1 ? 's' : ''}</span></li>
+      <li><Laptop size={16} style={{ flexShrink: 0, marginTop: '2px' }}/> <span><strong>{dataUsed.codeSessions}</strong> code analysis/optimize session{dataUsed.codeSessions !== 1 ? 's' : ''}</span></li>
       {dataUsed.weakestTopics?.length > 0 && (
-        <li><TrendingDown /> Weakest quiz topics: <strong>{dataUsed.weakestTopics.join(', ')}</strong></li>
+        <li><TrendingDown size={16} style={{ flexShrink: 0, marginTop: '2px' }}/> <span>Weakest quiz topics: <strong>{dataUsed.weakestTopics.join(', ')}</strong></span></li>
       )}
       {dataUsed.topMistakes?.length > 0 && (
-        <li><TriangleAlert /> Recurring mistakes: <strong>{dataUsed.topMistakes.slice(0, 3).join(', ')}</strong></li>
+        <li><TriangleAlert size={16} style={{ flexShrink: 0, marginTop: '2px' }}/> <span>Recurring mistakes: <strong>{dataUsed.topMistakes.slice(0, 3).join(', ')}</strong></span></li>
       )}
     </ul>
   </div>
@@ -140,8 +140,8 @@ const LearningRoadmap = ({ data }) => {
   const [dataUsed,    setDataUsed]    = useState(null);
   const [loading,     setLoading]     = useState(false);
   const [error,       setError]       = useState('');
+  const [roadmapMode, setRoadmapMode] = useState('Overall');
 
-  
   const [isVisible,   setIsVisible]   = useState(true);
 
   // selectedDay drives the modal — null means no modal shown
@@ -155,7 +155,7 @@ const LearningRoadmap = ({ data }) => {
     setIsVisible(true); // reopen if user had closed it
 
     try {
-      const res = await axios.get(`${API_BASE_URL}/quiz/learning-roadmap`, {
+      const res = await axios.get(`${API_BASE_URL}/quiz/learning-roadmap?mode=${encodeURIComponent(roadmapMode)}`, {
         headers: { Authorization: localStorage.getItem('token') }
       });
 
@@ -182,13 +182,25 @@ const LearningRoadmap = ({ data }) => {
       <div className={styles.wrapper}>
         <div className={styles.header}>
           <div>
-            <h3 className={styles.title}><BookOpenText/>Your 7-Day Learning Roadmap</h3>
+            <h3 className={styles.title} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><BookOpenText size={22} style={{ flexShrink: 0 }}/>Your 7-Day Learning Roadmap</h3>
             <p className={styles.subtitle}>
               AI builds a personalised plan from your code mistakes and quiz performance.
             </p>
           </div>
 
-          <div className={styles.headerActions}>
+          <div className={styles.headerActions} style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <select 
+              value={roadmapMode} 
+              onChange={(e) => setRoadmapMode(e.target.value)}
+              className={styles.generateBtn}
+              style={{ background: 'var(--card-bg)', color: 'var(--text)', padding: '10px 15px', border: '1px solid var(--card-border)' }}
+            >
+              <option value="Overall">Overall Roadmap</option>
+              <option value="Classic DSA">Classic DSA</option>
+              <option value="Code Debugging & Complexity">Code Debugging</option>
+              <option value="System Design">System Design</option>
+            </select>
+
             <button className={styles.generateBtn} onClick={generate} disabled={loading}>
               {loading ? (
                 <>Generating...</>

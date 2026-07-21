@@ -37,27 +37,27 @@ const ProgressView = ({ data }) => {
      
       <LearningRoadmap data={data} />
 
-      <div style={{ display: 'flex', gap: '20px', marginBottom: '30px', flexWrap: 'wrap' }}>
-        <div style={{ flex: '1 1 300px', height: 250, background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '20px', borderRadius: '8px' }}>
-          <h4 style={{ textAlign: 'center', marginBottom: '20px', color: 'var(--text)' }}>Recent Quiz Scores (%)</h4>
+      <div className={styles.chartRow}>
+        <div className={styles.chartBox}>
+          <h4 className={styles.chartTitle}>Recent Quiz Scores (%)</h4>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={scoreData}>
               <XAxis dataKey="name" stroke="var(--text)" />
               <YAxis stroke="var(--text)" domain={[0, 100]} />
-              <Tooltip cursor={{ fill: 'var(--bg)' }} contentStyle={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--card-border)', color: 'var(--text)' }} />
-              <Bar dataKey="score" fill="#0088FE" radius={[4, 4, 0, 0]} />
+              <Tooltip cursor={{ fill: 'var(--bg)' }} contentStyle={{ marginTop:'10px',backgroundColor: 'var(--card-bg)', borderColor: 'var(--card-border)', color: 'var(--text)' }} />
+              <Bar dataKey="score" fill="var(--primary)" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
-        <div style={{ flex: '1 1 300px', height: 250, background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '20px', borderRadius: '8px' }}>
-          <h4 style={{ textAlign: 'center', marginBottom: '20px', color: 'var(--text)' }}>Concept Grip (Radar)</h4>
+        <div className={styles.chartBox}>
+          <h4 className={styles.chartTitle}>Concept Grip (Radar)</h4>
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart cx="50%" cy="50%" outerRadius="60%" data={radarData}>
               <PolarGrid stroke="var(--card-border)" />
               <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text)', fontSize: 11 }} />
               <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
-              <Radar name="Score" dataKey="A" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.6} />
+              <Radar name="Score" dataKey="A" stroke="var(--primary)" fill="var(--primary)" fillOpacity={0.6} />
               <Tooltip contentStyle={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--card-border)', color: 'var(--text)' }} />
             </RadarChart>
           </ResponsiveContainer>

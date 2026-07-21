@@ -90,17 +90,17 @@ export const aiReview = async (req, res) => {
       return res.status(200).json({ review: "You haven't analyzed any code yet! Analyze some code to get personalized feedback on your coding habits." });
     }
 
-    const dataString = history.map(h => `Language: ${h.language} | Time: ${h.timeComplexity} | Topic: ${h.topic || 'Unknown'} | Difficulty: ${h.difficulty || 'Unknown'}`).join("\n");
+    const dataString = history.map(h => `Topic: ${h.topic || 'Unknown'} | Time: ${h.timeComplexity} | Mistakes: ${(h.mistakes || []).join(', ')}`).join("\n");
     
     const model = getGeminiModel();
     const prompt = `You are an expert computer science tutor. Analyze the following recent coding history for a student. 
     Based on their weaknesses, provide a highly structured, actionable learning plan formatted in Markdown.
     
     Include exactly these sections:
-    ### 🎯 Focus Area For Today
+    ###  Focus Area For Today
     (Identify their weakest topic or highest time complexity and explain exactly WHY they should focus on it).
     
-    ### 💡 Quick Tip
+    ###  Quick Tip
     (Provide a 2-sentence actionable rule of thumb related to their focus area, e.g., 'If you see nested loops, think Hash Map').
 
     Keep the entire response encouraging and under 150 words.
