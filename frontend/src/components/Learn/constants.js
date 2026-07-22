@@ -9,3 +9,20 @@ export const explanations = {
   "O(2^N)": "O(2^N) -> Exponential time: Doubles with each additional input. Example: Solving the subset sum problem via recursion.",
   "O(N!)": "O(N!) -> Factorial time: Extremely slow growth, tries all permutations. Example: Traveling Salesman Problem with brute-force.",
 };
+
+export const TOPIC_CATEGORIES = {
+  "Data Structures": {
+    "Arrays & Strings": "https://www.youtube.com/embed/8wmn7k1TTcI?si=brdDhfbk2aTM9057",
+    "Linked Lists": "https://www.youtube.com/embed/Hj_rA0dhr2I",
+    "Trees": "https://www.youtube.com/embed/-DzowlcaUmE?si=srt6uqSmfmjDZ3jc",
+    "Graphs": "https://www.youtube.com/embed/tWVWeAqZ0WU",
+    "Hash Maps": "https://www.youtube.com/embed/knV86FlSXJ8"
+  },
+  "Algorithms": {
+    "Sorting & Searching": "https://www.youtube.com/embed/pkkFqlG0Hds",
+    "Dynamic Programming": "https://www.youtube.com/embed/oBt53YbR9Kk"
+  },
+  "Architecture": {
+    "System Design": "https://www.youtube.com/embed/bUHFg8CZFws"
+  }
+};

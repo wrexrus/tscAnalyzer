@@ -1,6 +1,6 @@
 import QuizResult from "../Models/QuizResult.js";
 import AnalysisHistory from "../Models/AnalysisHistory.js";
-import { getGeminiModel, generateWithRetry } from "../Services/GeminiService.js";
+import { getGeminiModel, generateWithRetry, generateWithRetryStream } from "../Services/GeminiService.js";
 
 const extractQuizInsights = (results) => {
   const topicMap = {};
@@ -293,5 +293,58 @@ export const aiReview = async (req, res) => {
       return res.status(503).json({ error: "The AI model is currently experiencing high demand. Please wait a moment and try again!" });
     }
     res.status(500).json({ error: "Failed to generate AI review." });
+  }
+};
+
+export const learnConcept = async (req, res) => {
+  const topic = req.query.topic;
+  if (!topic) {
+    return res.status(400).json({ error: "Topic is required" });
+  }
+
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+
+  try {
+    const model = getGeminiModel();
+    const prompt = `You are an expert computer science tutor.
+    Explain the concept of "${topic}" in a beginner-friendly way.
+    Approach the explanation, especially the analogy, from a unique creative angle each time. (Random Seed: ${Math.random()})
+    
+    Format your response in Markdown with exactly these sections:
+    
+    ## Analogy
+    (Provide a simple, highly creative real-world analogy to explain how ${topic} works. Make it different from standard textbook examples).
+    
+    ## Time & Space Complexity
+    (Provide the Average and Worst-case time and space complexities using easily readable bullet points. Do NOT use markdown tables).
+    
+    ## Pros & Cons
+    (List 2 pros and 2 cons).
+    
+    ## Pseudo-Code
+    (Provide a small, clear pseudo-code snippet demonstrating the core logic of the concept. Do not use a specific programming language).
+    
+    Keep the entire response structured, beautiful, and under 250 words so it's a quick read.`;
+
+    const result = await generateWithRetryStream(model, prompt);
+    
+    for await (const chunk of result.stream) {
+      const chunkText = chunk.text();
+      res.write(`data: ${JSON.stringify({ text: chunkText })}\n\n`);
+    }
+    
+    res.write("data: [DONE]\n\n");
+    res.end();
+  } catch (error) {
+    console.error("Error generating concept lesson stream:", error);
+    if (error.status === 503) {
+      res.write(`data: ${JSON.stringify({ error: "The AI model is currently busy. Please wait a moment and try again!" })}\n\n`);
+    } else {
+      res.write(`data: ${JSON.stringify({ error: "Failed to generate concept lesson." })}\n\n`);
+    }
+    res.write("data: [DONE]\n\n");
+    res.end();
   }
 };

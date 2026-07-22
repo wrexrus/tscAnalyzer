@@ -229,3 +229,167 @@
 .cs-good { background: rgba(132,204,22,0.1); color: #84cc16; }
 .cs-fair { background: rgba(245,158,11,0.1); color: #f59e0b; }
 .cs-bad { background: rgba(239,68,68,0.1); color: #ef4444; }
+
+/* ========= DYNAMIC CONCEPT LIBRARY ========= */
+.learn-subtitle {
+  font-size: 1.1rem;
+  color: var(--text);
+  opacity: 0.7;
+  margin-bottom: 25px;
+}
+
+.categories-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+.category-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.category-heading {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  color: var(--primary);
+  margin-bottom: 15px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--card-border);
+  padding-bottom: 5px;
+}
+
+.topic-pills {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap; /* Removed overflow-x and added flex-wrap */
+  justify-content: center;
+}
+
+.topic-pill {
+  background: var(--bg);
+  border: 1px solid var(--card-border);
+  color: var(--text);
+  padding: 10px 18px;
+  border-radius: 20px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.topic-pill:hover {
+  border-color: var(--primary);
+  background: rgba(128, 128, 128, 0.05);
+}
+
+.topic-pill.active {
+  background: var(--primary);
+  color: var(--button-text);
+  border-color: var(--primary);
+}
+
+.mode-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--text);
+  border: 2px solid var(--card-border);
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mode-btn:hover {
+  background: rgba(128, 128, 128, 0.05);
+}
+
+.mode-btn.active {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(var(--primary-rgb), 0.05); /* if primary-rgb is available, or just fallback */
+}
+
+.dynamic-content-area {
+  min-height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.ai-lesson-box {
+  background: var(--bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 30px;
+  text-align: left;
+  color: var(--text);
+  width: 100%;
+  max-width: 800px;
+  line-height: 1.7;
+}
+
+.ai-lesson-box h2 {
+  font-family: 'Playfair Display', serif;
+  color: var(--primary);
+  margin-top: 25px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid var(--card-border);
+  padding-bottom: 8px;
+}
+
+.ai-lesson-box h2:first-child {
+  margin-top: 0;
+}
+
+.ai-lesson-box pre {
+  background: rgba(201, 195, 195, 0.3);
+  padding: 15px;
+  border-radius: 8px;
+  overflow-x: auto;
+  border: 1px solid var(--card-border);
+}
+
+.ai-lesson-box code {
+  font-family: 'Consolas', monospace;
+}
+
+.ai-lesson-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: var(--text);
+  opacity: 0.7;
+  gap: 15px;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  color: var(--primary);
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
