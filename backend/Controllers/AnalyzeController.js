@@ -30,6 +30,7 @@ const analyze = asyncHandler(async (req, res, next) => {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no'); // Prevents proxy buffering on deployed platforms like Vercel/Render
     if (res.flushHeaders) res.flushHeaders();
 
     let responseText = "";

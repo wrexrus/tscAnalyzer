@@ -22,17 +22,10 @@ app.use(helmet());  // secures http response headers
 
 app.use(express.json());
 
-// restrict CORS to specific frontend origins
-const allowedOrigins = [process.env.FRONTEND_URL || "http://localhost:5173"];
+// restrict CORS to specific frontend origins or allow all for robust deployments
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    }, 
+    origin: true, // Allow any origin to accommodate dynamic deployment URLs (like Vercel)
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
   })
