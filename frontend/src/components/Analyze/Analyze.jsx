@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
 import ComplexityGraph from "../ComplexityGraph";  
 import AstVisualizer from "../AstVisualizer/AstVisualizer";
 import ActionToolbar from "./ActionToolbar";
@@ -11,7 +13,9 @@ const Analyze = () => {
   const [result, setResult] = useState(null);
   const [showResult, setShowResult] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [currentMode, setCurrentMode] = useState('analyze'); // tracks which btn was clicked
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
   const [isCodeMaximized, setIsCodeMaximized] = useState(false);
   const [astGraph, setAstGraph] = useState(null);
@@ -19,6 +23,7 @@ const Analyze = () => {
   const [mode, setMode] = useState('analyze');
   const [targetLanguage, setTargetLanguage] = useState('Python');
   const resultRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const onAuthChange = () => setIsLoggedIn(!!localStorage.getItem('token'));
@@ -42,7 +47,12 @@ const Analyze = () => {
        return;
     }
     const finalLang = customLang || targetLanguage;
+    setCurrentMode(selectedMode);
     setLoading(true);
+    setIsStreaming(false);
+    setResult(null);
+    setShowResult(true); // show skeleton immediately on click
+    setActiveTab('explanation');
     setProgress(8);
 
     let id = setInterval(() => {
@@ -85,6 +95,7 @@ const Analyze = () => {
 
       setShowResult(true);
       setResult({ explanation: "" });
+      setIsStreaming(true);
 
       while (!done) {
         const { value, done: readerDone } = await reader.read();
@@ -106,11 +117,8 @@ const Analyze = () => {
                 try {
                   const parsed = JSON.parse(dataStr);
                   if (parsed.text) {
-                    for (const char of parsed.text) {
-                      analysisText += char;
-                      setResult({ explanation: analysisText });
-                      await new Promise(r => setTimeout(r, 10)); // Typewriter effect
-                    }
+                    analysisText += parsed.text;
+                    setResult({ explanation: analysisText });
                   }
                 } catch (e) {}
               }
@@ -119,16 +127,15 @@ const Analyze = () => {
         }
       }
       
-      setProgress(100);
     } catch (err) {
       handleError("Network error. Check console.");
       console.error(err);
     } finally {
       clearInterval(id);
-      setTimeout(() => {
-        setLoading(false);
-        setProgress(0);
-      }, 350);
+      setProgress(100);
+      setLoading(false);
+      setIsStreaming(false);
+      setTimeout(() => setProgress(0), 350);
     }
   };
 
@@ -139,6 +146,15 @@ const Analyze = () => {
     setIsCodeMaximized(false);
     setAstGraph(null);
     setActiveTab('explanation');
+    setIsStreaming(false);
+    setCurrentMode('analyze');
+  };
+
+  const modeLabel = {
+    analyze: 'Analyzing your code',
+    optimize: 'Optimizing your code',
+    convert: `Converting to ${targetLanguage}`,
+    test: 'Generating knowledge test',
   };
 
   const isErrorFallback = result?.explanation?.startsWith("Error:");
@@ -209,7 +225,7 @@ const Analyze = () => {
                   >
                     {isErrorFallback ? "Code Error" : "Unified Explanation"}
                   </h4>
-                  {mode === 'analyze' && (
+                  {currentMode === 'analyze' && (
                     <h4 
                       onClick={() => setActiveTab('ast')} 
                       style={{ cursor: 'pointer', paddingBottom: '10px', color: activeTab === 'ast' ? 'var(--primary)' : 'var(--text)', borderBottom: activeTab === 'ast' ? '2px solid var(--primary)' : 'none' }}
@@ -219,18 +235,27 @@ const Analyze = () => {
                   )}
                 </div>
 
-                {activeTab === 'explanation' ? (
+                {/* Processing skeleton shown immediately on click */}
+                {loading && !result?.explanation && (
+                  <div className={styles.processingBox}>
+                    <div className={styles.processingSpinner} />
+                    <p className={styles.processingLabel}>{modeLabel[currentMode]}...</p>
+                    <div className={styles.skeletonBar} style={{ width: '80%' }} />
+                    <div className={styles.skeletonBar} style={{ width: '60%' }} />
+                    <div className={styles.skeletonBar} style={{ width: '70%' }} />
+                  </div>
+                )}
+
+                {activeTab === 'explanation' && result?.explanation ? (
                   <>
-                    <p className={styles.explanation} style={{ whiteSpace: 'pre-wrap', color: isErrorFallback ? '#ff4d4f' : 'inherit' }}>
-                      {result?.explanation}
-                    </p>
-                    {!isErrorFallback && mode === 'analyze' && <ComplexityGraph explanation={result?.explanation} />}
+                    <div className={`${styles.markdownResult} ${isErrorFallback ? styles.errorResult : ''}`}>
+                      <ReactMarkdown>{result.explanation}</ReactMarkdown>
+                      {isStreaming && <span className={styles.streamingCursor}>▋</span>}
+                    </div>
+                    {!isErrorFallback && currentMode === 'analyze' && <ComplexityGraph explanation={result?.explanation} />}
                   </>
-                ) : (
+                ) : activeTab === 'ast' ? (
                   <>
-                    {/* <p style={{ color: 'var(--text)', opacity: 0.8, marginBottom: '15px' }}>
-                      This is the actual Abstract Syntax Tree generated by parsing your code using a real compiler parser (@babel/parser), independent of the AI.
-                    </p> */}
                     {astGraph ? (
                       <AstVisualizer nodes={astGraph.nodes} edges={astGraph.edges} />
                     ) : (
@@ -239,18 +264,19 @@ const Analyze = () => {
                       </div>
                     )}
                   </>
-                )}
+                ) : null}
               </div>
 
-              <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+              <div style={{ display: "flex", gap: "10px", marginTop: "20px", flexWrap: 'wrap' }}>
                 <button 
                   className={styles.resetBtn} 
                   onClick={handleReset} 
-                  style={{ flex: 1, opacity: loading ? 0.5 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
+                  style={{ flex: 1, opacity: loading ? 0.5 : 1, cursor: loading ? 'not-allowed' : 'pointer', minWidth: '140px' }}
                   disabled={loading}
                 >
                   Test New Code
                 </button>
+                
               </div>
             </div>
           )}

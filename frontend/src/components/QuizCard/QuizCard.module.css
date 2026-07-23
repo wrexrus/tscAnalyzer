@@ -211,7 +211,7 @@
   text-align: left;
 }
 
-.review-card {
+.review-card {  
   border-bottom: 1px solid var(--card-border, #333);
   padding: 16px 0;
   margin-bottom: 16px;

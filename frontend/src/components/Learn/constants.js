@@ -12,7 +12,8 @@ export const explanations = {
 
 export const TOPIC_CATEGORIES = {
   "Data Structures": {
-    "Arrays & Strings": "https://www.youtube.com/embed/8wmn7k1TTcI?si=brdDhfbk2aTM9057",
+    "Arrays": "https://www.youtube.com/embed/8wmn7k1TTcI?si=brdDhfbk2aTM9057",
+    "Strings":"https://www.youtube.com/embed/Wdjr6uoZ0e0?si=1y7kXOjRdtGxo5Cd",
     "Linked Lists": "https://www.youtube.com/embed/Hj_rA0dhr2I",
     "Trees": "https://www.youtube.com/embed/-DzowlcaUmE?si=srt6uqSmfmjDZ3jc",
     "Graphs": "https://www.youtube.com/embed/tWVWeAqZ0WU",

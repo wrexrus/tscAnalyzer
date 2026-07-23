@@ -101,13 +101,23 @@ const HistoryView = ({ data }) => {
         <LanguagePieChart data={filteredData} />
 
         {/* Time complexity bar */}
-        <div style={{ flex: '1 1 280px', height: 320, background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '20px', borderRadius: '8px' }}>
-          <h4 style={{ textAlign: 'center', marginBottom: '20px', color: 'var(--text)' }}>Time Complexities Used</h4>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={complexityData} margin={{ bottom: 40 }}>
-              <XAxis dataKey="name" stroke="var(--text)" tick={{ fontSize: 11, angle: -45, textAnchor: 'end' }} interval={0} />
-              <YAxis stroke="var(--text)" />
-              <Tooltip cursor={{ fill: 'var(--bg)' }} contentStyle={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--card-border)', color: 'var(--text)' }} />
+        <div style={{ flex: '1 1 280px', background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '20px', borderRadius: '8px' }}>
+          <h4 style={{ textAlign: 'center', marginBottom: '10px', color: 'var(--text)' }}>Time Complexities Used</h4>
+          <ResponsiveContainer width="100%" height={270}>
+            <BarChart data={complexityData} margin={{ top: 5, right: 10, left: 0, bottom: 60 }}>
+              <XAxis
+                dataKey="name"
+                stroke="var(--text)"
+                interval={0}
+                tick={{ fontSize: 12, fill: 'var(--text)', angle: -35, textAnchor: 'end' }}
+                height={60}
+              />
+              <YAxis stroke="var(--text)" allowDecimals={false} tick={{ fontSize: 11 }} width={30} />
+              <Tooltip
+                cursor={{ fill: 'var(--bg)' }}
+                contentStyle={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--card-border)', color: 'var(--text)' }}
+                formatter={(v) => [v, 'Occurrences']}
+              />
               <Bar dataKey="count" fill="#84cc16" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>

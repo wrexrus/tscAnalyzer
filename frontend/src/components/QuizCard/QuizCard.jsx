@@ -375,7 +375,7 @@ const QuizCard = () => {
                   <h4 className={styles["review-question"]}>Q{idx + 1}: {q.text}</h4>
                   
                   <p style={{ color: isCorrect ? '#4caf50' : '#f44336', fontWeight: 600, margin: '8px 0' }}>
-                    Your Answer: {q.options[userAnswer]} {isCorrect ? <CircleCheck /> : <CircleX />}
+                    Your Answer: {q.options[userAnswer]} 
                   </p>
                   
                   {!isCorrect && (

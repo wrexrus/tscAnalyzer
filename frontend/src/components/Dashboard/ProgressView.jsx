@@ -40,11 +40,20 @@ const ProgressView = ({ data }) => {
       <div className={styles.chartRow}>
         <div className={styles.chartBox}>
           <h4 className={styles.chartTitle}>Recent Quiz Scores (%)</h4>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={scoreData}>
-              <XAxis dataKey="name" stroke="var(--text)" />
-              <YAxis stroke="var(--text)" domain={[0, 100]} />
-              <Tooltip cursor={{ fill: 'var(--bg)' }} contentStyle={{ marginTop:'10px',backgroundColor: 'var(--card-bg)', borderColor: 'var(--card-border)', color: 'var(--text)' }} />
+          <ResponsiveContainer width="100%" height={240}>
+            <BarChart data={scoreData} margin={{ top: 0, right: 5, left: 0, bottom: 0 }}>
+              <XAxis
+                dataKey="name"
+                stroke="var(--text)"
+                tick={{ fontSize: 12, fill: 'var(--text)' }}
+                interval={0}
+              />
+              <YAxis stroke="var(--text)" domain={[0, 100]} tick={{ fontSize: 11 }} width={35} />
+              <Tooltip
+                cursor={{ fill: 'var(--bg)' }}
+                contentStyle={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--card-border)', color: 'var(--text)' }}
+                formatter={(v) => [`${v}%`, 'Score']}
+              />
               <Bar dataKey="score" fill="var(--primary)" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>

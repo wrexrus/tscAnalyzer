@@ -36,13 +36,10 @@ const Dashboard = ({ theme, toggleTheme, onBotClick }) => {
       navigate('/login');
       return;
     }
-    fetchData();
-  }, [activeTab]); 
-
-  useEffect(() => {
     setSearchParams({ tab: activeTab });
     setAiReview('');
-  }, [activeTab, setSearchParams]);
+    fetchData();
+  }, [activeTab]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -116,7 +113,7 @@ const Dashboard = ({ theme, toggleTheme, onBotClick }) => {
 
           {/*  AI Tutor Sidebar  */}
           <div className={styles.aiPanel}>
-            <h3 className={styles.aiTitle}><Bot size={40} style={{ flexShrink: 0 }} /> AI Tutor Review</h3>
+            <h3 className={styles.aiTitle}><Bot size={22} style={{ flexShrink: 0 }} /> AI Tutor Review</h3>
             <p className={styles.aiDesc}>
               Get personalized feedback based on your recent {activeTab === 'progress' ? 'quiz performance' : 'coding history'}.
             </p>

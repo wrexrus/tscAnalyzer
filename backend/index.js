@@ -4,7 +4,6 @@ dotenv.config({ path: "./.env" });
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import "./Models/db.js";
 import AuthRouter from "./Routes/AuthRouter.js";
 import ChatRouter from "./Routes/ChatRouter.js";
@@ -39,7 +38,7 @@ app.use(
   })
 );
 
-app.use(bodyParser.json());
+
 
 app.get("/", (_req, res) => {
   res.status(200).send("OK");

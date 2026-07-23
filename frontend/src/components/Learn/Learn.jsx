@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import QuizCard from "../QuizCard/QuizCard";
 import { explanations, TOPIC_CATEGORIES } from "./constants";
-import axios from "axios";
 import ReactMarkdown from "react-markdown";
 import { API_BASE_URL } from "../../api";
-import { Video, BookOpen, Loader2 } from "lucide-react";
+import { Video, BookOpen, Loader2, Link } from "lucide-react";
+import masteryGuide from "./masteryGuide.md?raw";
 import "./Learn.css";
+import { TextCursor } from 'lucide-react';
 
 const tiers = {
   "O(1)": "excellent",
@@ -20,28 +21,33 @@ const tiers = {
 };
 
 const Learn = () => {
-  const firstCategory = Object.keys(TOPIC_CATEGORIES)[0];
-  const firstTopic = Object.keys(TOPIC_CATEGORIES[firstCategory])[0];
-  const [activeTopic, setActiveTopic] = useState(null); // default to null
-  const [activeVideo, setActiveVideo] = useState("https://www.youtube.com/embed/FPu9Uld7W-E?start=75"); // default roadmap video
+  const [activeTopic, setActiveTopic] = useState(null); 
+  const [activeVideo, setActiveVideo] = useState("https://www.youtube.com/embed/uBE9zLU--DA?si=KnikDenx20tyEv6E"); 
   const [learnMode, setLearnMode] = useState("watch");
   const [aiLesson, setAiLesson] = useState("");
   const [lessonLoading, setLessonLoading] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
 
   // Big-O Growth section states
   const [activeO, setActiveO] = useState(null);
   const [hoverHeading, setHoverHeading] = useState(false);
   const [hoveredItem, setHoveredItem] = useState(null);
 
-  // Fetch AI Lesson when "read" mode is selected
   useEffect(() => {
     if (learnMode === "read") {
-      fetchAiLesson(activeTopic || "How to master DSA, Algorithms, and System Design Architecture");
+      if (!activeTopic) {
+        // setAiLesson(masteryGuide);
+        setAiLesson("Roadmap - https://roadmap.sh/datastructures-and-algorithms");
+        setLessonLoading(false);
+      } else {
+        fetchAiLesson(activeTopic);
+      }
     }
   }, [activeTopic, learnMode]);
 
   const fetchAiLesson = async (topic) => {
     setLessonLoading(true);
+    setIsStreaming(false);
     setAiLesson("");
     try {
       const response = await fetch(`${API_BASE_URL}/quiz/learn-concept?topic=${encodeURIComponent(topic)}`);
@@ -50,7 +56,8 @@ const Learn = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      setLessonLoading(false); // Stop loader, start streaming
+      setLessonLoading(false);
+      setIsStreaming(true);
       const reader = response.body.getReader();
       const decoder = new TextDecoder("utf-8");
       
@@ -89,7 +96,9 @@ const Learn = () => {
       console.error("Error fetching AI lesson stream:", err);
       setAiLesson("Failed to load AI lesson. Please try again later.");
       setLessonLoading(false);
+      setIsStreaming(false);
     }
+    setIsStreaming(false);
   };
 
   return (
@@ -163,7 +172,10 @@ const Learn = () => {
                   <p>Generating personalized lesson for {activeTopic || "mastering DSA & Architecture"}...</p>
                 </div>
               ) : (
-                <ReactMarkdown>{aiLesson}</ReactMarkdown>
+                <>
+                  <ReactMarkdown>{aiLesson}</ReactMarkdown>
+                  {isStreaming && <span className="streaming-cursor"><TextCursor /></span>}
+                </>
               )}
             </div>
           )}

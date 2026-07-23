@@ -34,11 +34,11 @@ function Home() {
       <h1 className="hero-text">{displayedText}</h1>
 
       <p className={`sub-text ${showSub ? "visible" : ""}`}>
-        Your complexity journey starts here
+        Your complexity - coding journey starts here
       </p>
 
       <h3 className={`tag-text ${showTag ? "visible" : ""}`}>
-        Crack the code — before it cracks your runtime!
+        Crack the code - before it cracks your runtime!
       </h3>
 
       <div className={`cta-container ${showTag ? "visible" : ""}`}>

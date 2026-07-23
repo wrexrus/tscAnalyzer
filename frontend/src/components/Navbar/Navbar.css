@@ -77,6 +77,28 @@
   color: var(--button-text);
 }
 
+/* Dashboard nav button — shown for logged-in users */
+.dashboard-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  transition: background 0.2s, color 0.2s;
+}
+
+.dashboard-nav-btn:hover {
+  background: var(--primary);
+  color: var(--button-text);
+}
+
 .auth-btn {
   padding: 8px 16px;
   border-radius: 8px;

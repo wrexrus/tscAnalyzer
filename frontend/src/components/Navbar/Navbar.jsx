@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './Navbar.css';
-import { ToastContainer } from 'react-toastify';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { handleSuccess } from '../../pages/utils';
-import { Sun, Moon, Bot, Menu, X } from 'lucide-react';
+import { Sun, Moon, Bot, Menu, X, LayoutDashboard } from 'lucide-react';
 
 
 const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
@@ -19,7 +18,6 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
 
   useEffect(() => {
     setLoggedInUser(localStorage.getItem('loggedInUser'));
-    // update on storage changes (other tabs) and on custom authChanged event (this tab)
     const onAuthChange = () => setLoggedInUser(localStorage.getItem('loggedInUser'));
     window.addEventListener('storage', onAuthChange);
     window.addEventListener('authChanged', onAuthChange);
@@ -38,6 +36,12 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
     navigate('/');
   };
 
+  const navLinks = [
+    { name: 'Home', id: 'home' },
+    { name: 'Learn', id: 'learn' },
+    { name: 'Unified Code', id: 'analyze' },
+  ];
+
   return (
     <nav className="navbar">
       <div className="nav-left">
@@ -52,11 +56,7 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
             Home
           </a>
         ) : (
-          [
-            { name: 'Home', id: 'home' },
-            { name: 'Learn', id: 'learn' },
-            { name: 'Unified Code', id: 'analyze' }
-          ].map(item => (
+          navLinks.map(item => (
             <a
               key={item.name}
               href={`#${item.id}`}
@@ -70,36 +70,39 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
         )}
       </div>
 
-      {/* Hamburger Icon for Mobile */}
+      {/* hamburger Icon for Mobile */}
       <div className="hamburger" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
         {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
       </div>
 
       <div className={`nav-right ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
-        {/* On mobile, close menu when clicking inside nav-right items */}
+        {/* mobile menu links */}
         {isMobileMenuOpen && (
           <div className="mobile-nav-links">
             {isDashboard ? (
               <a onClick={() => { navigate('/'); setIsMobileMenuOpen(false); }} className="nav-link">Home</a>
             ) : (
-              [
-                { name: 'Home', id: 'home' },
-                { name: 'Learn', id: 'learn' },
-                { name: 'Unified Code', id: 'analyze' }
-              ].map(item => (
+              navLinks.map(item => (
                 <a key={item.name} href={`#${item.id}`} className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
                   {item.name}
                 </a>
               ))
             )}
+            {loggedInUser && (
+              <a onClick={() => { navigate('/dashboard'); setIsMobileMenuOpen(false); }} className="nav-link" style={{ cursor: 'pointer' }}>
+                Dashboard
+              </a>
+            )}
           </div>
         )}
 
+        {/* theme toggle */}
         <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
           {isDark ? <Sun size={18} /> : <Moon size={18} />}
           <span className="theme-label">{isDark ? 'Light' : 'Dark'}</span>
         </button>
 
+        {/* chatbot — hidden on dashboard */}
         {!isDashboard && (
           <div
             className={`chatbot-btn ${chatbotHovered ? 'hovered' : ''}`}
@@ -112,10 +115,22 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
           </div>
         )}
 
+        {/* Auth section */}
         {loggedInUser ? (
-          <div className="user-section" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-            <div 
-              className="profile-avatar" 
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            {!isDashboard && (
+              <button
+                className="dashboard-nav-btn"
+                onClick={() => navigate('/dashboard')}
+                title="Go to Dashboard"
+                style={{marginRight:'15px'}}
+              >
+                <LayoutDashboard size={15} />
+                Dashboard
+              </button>
+            )}
+            <div
+              className="profile-avatar"
               onClick={() => setShowDropdown(!showDropdown)}
               title={loggedInUser}
             >
@@ -125,8 +140,8 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
               <div className="profile-dropdown">
                 <div className="dropdown-user">{loggedInUser}</div>
                 <hr className="dropdown-divider" />
-                <button 
-                  className="dropdown-logout" 
+                <button
+                  className="dropdown-logout"
                   onClick={() => { setShowDropdown(false); handleLogout(); }}
                 >
                   Logout
@@ -144,10 +159,7 @@ const Navbar = ({ onBotClick, currentTheme, toggleTheme }) => {
             </button>
           </div>
         )}
-
-        <ToastContainer />
       </div>
-
     </nav>
   );
 };

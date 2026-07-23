@@ -112,6 +112,27 @@
 .aiResponse h3:first-child {
   margin-top: 0;
 }
+.aiResponse p {
+  margin: 8px 0;
+}
+.aiResponse ul, .aiResponse ol {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+.aiResponse li {
+  margin-bottom: 4px;
+}
+.aiResponse strong {
+  color: var(--primary);
+  font-weight: 600;
+}
+.aiResponse code {
+  background: rgba(128,128,128,0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Consolas', monospace;
+  font-size: 0.9em;
+}
 .list {
   display: flex;
   flex-direction: column;
